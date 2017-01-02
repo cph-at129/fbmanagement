@@ -1,0 +1,25 @@
+<div class="btn-group" dropdown dropdown-append-to-body>
+    <button id="btn-append-to-body" type="button" class="btn btn-primary" dropdownToggle>
+        Sort By
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="btn-append-to-body">
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('reset')">Reset</button>
+        </li>
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('clicks')">Clicks</button>
+        </li>
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('reach')">Reach</button>
+        </li>
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('impressions')">Impressions</button>
+        </li>
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('newest')">New first</button>
+        </li>
+        <li role="menuitem">
+            <button class="dropdown-item" (click)="sortByTrigger('oldest')">Old first</button>
+        </li>
+    </ul>
+</div>

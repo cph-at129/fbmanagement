@@ -1,0 +1,46 @@
+<div class="btn-group" dropdown dropdown-append-to-body>
+  <button id="btn-append-to-body" type="button" class="btn btn-primary" dropdownToggle>
+                        Filter By
+                    </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="btn-append-to-body">
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('all')">All</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('page_likes')">Page Likes</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('post_engagement')">Post Engagement</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('offer_claims')">Offer Claims</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('local_awareness')">Local Awareness</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('brand_awareness')">Brand Awareness</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('lead_generation')">Lead Generation</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('event_responses')">Event Responses</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('website_clicks')">Website Clicks</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('app_engagement')">App Engagement</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('app_installs')">App Installs</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('website_conversions')">Website Conversions</button>
+    </li>
+    <li role="menuitem">
+      <button class="dropdown-item" (click)="sortByTrigger('video_views')">Video Views</button>
+    </li>
+  </ul>
+</div>

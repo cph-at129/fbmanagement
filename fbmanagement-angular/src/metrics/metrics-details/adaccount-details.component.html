@@ -1,0 +1,158 @@
+<navigation></navigation>
+<div class="container">
+  <div class="row" *ngIf="!error && !info && hasAdAccountDetails">
+    <alert type="info" dismissible="true">
+      <div class="col-md-10">
+        <p><em>Sync your account now to get the latest metrics!</em></p>
+      </div>
+      <button class="btn btn-warning" (click)="syncAdAccount(account_id)">Sync Now</button>
+    </alert>
+  </div>
+  <div *ngIf="error">
+    <button class="btn btn-warning" *ngIf="!hasAdAccountDetails" (click)="syncAdAccount(account_id)">Sync Now</button>
+    <alert type="danger" *ngIf="error" dismissible="true">{{error}}</alert>
+  </div>
+  <div *ngIf="info">
+    <alert type="success" *ngIf="info" dismissOnTimeout="3000">{{info}}</alert>
+  </div>
+  <div class="row bg-default card  campaignPanel" *ngFor="let campaign of campaigns">
+    <div class="card-block btn-primary" (click)="isCollapsed = !isCollapsed" [ngStyle]="{'cursor': 'pointer'}">
+      <div class="card-title">Campaign - {{campaign.campaign_name}}</div>
+    </div>
+    <div class="card-block" [collapse]="isCollapsed">
+      <div class="col-md-4 card campaignPanel">
+        <div class="card-block btn-primary" (click)="isCollapsedCampaign = !isCollapsedCampaign" [ngStyle]="{'cursor': 'pointer'}">
+          <div class="card-title">Campaign Stats</div>
+        </div>
+        <div class="card-block" [collapse]="isCollapsedCampaign">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <i class="fa fa-user" aria-hidden="true"></i> {{campaign.account_name}}
+            </li>
+            <li class="list-group-item" [style.background]="'green'">
+              <i class="fa fa-eye" aria-hidden="true"></i> Impressions {{campaign.unique_impressions}}
+            </li>
+            <li class="list-group-item">
+              <i class="fa fa-flag" aria-hidden="true"></i> Reach {{campaign.reach}}
+            </li>
+            <li class="list-group-item">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks {{campaign.clicks}}
+            </li>
+            <li class="list-group-item">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> {{campaign.objective}}
+            </li>
+            <li class="list-group-item">
+              <i class="fa fa-refresh" aria-hidden="true"></i> {{lastSynced | date:'medium'}}
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <span class="tag tag-default" (mouseover)="setCurrency(campaign.currency.user_currency)" [ngStyle]="{'cursor': 'pointer'}">{{campaign.currency.user_currency}}</span>
+                <span class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
+                <span class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
+                <span class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
+              </div>
+              <div class="row">
+                <span *ngIf="preferred_currency === campaign.currency.user_currency">Spent <span [style.color]="'green'">{{campaign.currency.user_currency + '' + campaign.spend }}</span></span>
+                <span *ngIf="preferred_currency !== campaign.currency.user_currency">Spent <span [style.color]="'green'">{{campaign.spend | currencyConverter:campaign.currency.user_currency:preferred_currency | async}}</span></span>
+              </div>
+            </li>
+          </ul>
+          <div class="card-block">
+            <a routerLink="/campaign/{{campaign.campaign_id}}" class="btn btn-success">
+              campaign details
+            </a>
+          </div>
+        </div>
+        <div class="card-block adsetPanel">
+          <div class="card">
+            <div class="card-block btn-primary">
+              <div class="card-title">
+                Campaign Ad Sets
+              </div>
+            </div>
+            <div class="card-block">
+              <div class="card" *ngFor="let adset of adsets">
+                <div class="card-block btn-primary">
+                  <div class="card-title text-xs-center">
+                    <p>{{adset.adset_name}}</p>
+                  </div>
+                </div>
+                <div class="card-block row">
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <span class="tag tag-info" *ngFor="let device of adset.targeting.device_platforms">{{device}}</span>
+                    </div>
+                    <div class="col-xs-6">
+                      <span class="tag tag-info" *ngFor="let publisher of adset.targeting.publisher_platforms">{{publisher}}</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <span class="tag tag-info">Age min {{adset.targeting.age_min}}</span>
+                    </div>
+                    <div class="col-xs-6">
+                      <span class="tag tag-info">Age max {{adset.targeting.age_max}}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-block text-xs-center">
+                  <a routerLink="/adset/{{adset.adset_id}}" class="btn btn-success">adset details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-block btn-primary" (click)="isCollapsedAd = !isCollapsedAd" [ngStyle]="{'margin': '10px'}">
+            <div class="card-title">Ads</div>
+          </div>
+          <div class="row" [ngStyle]="{'margin':'10px'}">
+            <div class="col-xs-4">
+              <div class="input-group">
+                <input type="text" [(ngModel)]="searchText" class="form-control" placeholder="Search for ads..">
+              </div>
+            </div>
+            <div class="col-xs-8">
+              <div class="col-xs-3">
+                <metrics-objective-filter (sortBy)="(filterByObjective( $event ))"></metrics-objective-filter>
+              </div>
+              <div class="col-xs-2"></div>
+              <div class="col-xs-3">
+                <metrics-criteria-filter (sortBy)="(filterByCriteria( $event ))"></metrics-criteria-filter>
+              </div>
+            </div>
+          </div>
+          <div class="card card-block" [collapse]="isCollapsedAd" *ngFor="let ad of ads | search:'ad':searchText">
+            <div class="card">
+              <div class="card-block" [collapse]="isCollapsedAd">
+                <div class="row">
+                  <div class="col-xs-2">
+                    <img class="card-img-top" src="{{ad.ad_creatives.thumbnail_url}}" alt="post image">
+                  </div>
+                  <div class="col-xs-10">
+                    <div class="card-title" [ngStyle]="{'cursor': 'pointer'}">{{ad.ad_name| slice:5}}</div>
+                  </div>
+                </div>
+                <div class="col-xs-6 text-xs-center">
+                  <p class="card-text"><span class="tag tag-info">{{ad.status}}</span></p>
+                  <p class="card-text"><span class="tag tag-info">{{ad.created_time| date:'medium'}}</span></p>
+                </div>
+                <div class="col-xs-6 text-xs-center">
+                  <p class="card-text"><i class="fa fa-eye" aria-hidden="true"></i>Impressions <span class="tag tag-info"> {{ad.unique_impressions}}</span></p>
+                  <p class="card-text"> <i class="fa fa-mouse-pointer" aria-hidden="true"></i>Clicks <span class="tag tag-info">{{ad.clicks}}</span></p>
+                </div>
+              </div>
+              <div class="card-block text-xs-center">
+                <a routerLink="/ad/{{ad.ad_id}}" class="btn btn-success">ad details</a>
+                <a routerLink="/post/{{ad.ad_creatives.object_story_id}}" class="btn btn-success">post details</a>
+                <a href="{{ad.ad_creatives.instagram_permalink_url}}" class="btn btn-success" target="_blank">instagram link</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

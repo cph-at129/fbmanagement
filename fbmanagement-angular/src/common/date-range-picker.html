@@ -1,0 +1,19 @@
+<div *ngIf="_datePickerType">
+  <div *ngIf="_datePickerType === 'custom'">
+    <div style="display:inline-block; min-height:290px;">
+      <div class="list-group">
+        <a href="#" class="list-group-item active" (click)="submitDate()">Submit Date: {{ getDate() | date:'shortDate'}}</a>
+      </div>
+      <datepicker [(ngModel)]="dt" [minDate]="minDate" [maxDate]="maxDate" [showWeeks]="false"></datepicker>
+    </div>
+  </div>
+  <div *ngIf="_datePickerType === 'ranges'">
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">Date Range</button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a class="dropdown-item" href="#" *ngFor="let item of dateRangeTypesArray" (click)="submitDate(item)">{{item}}</a>
+      </div>
+    </div>
+  </div>
+</div>

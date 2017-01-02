@@ -1,0 +1,46 @@
+{
+  "name": "fbmanagement-backend",
+  "version": "0.1.0",
+  "description": "fbmanagement backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "fbmanagement",
+    "mindjumpers",
+    "express",
+    "graph_api"
+  ],
+  "author": "Mindjumpers",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "body-parser": "^1.15.0",
+    "compression": "^1.6.1",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.7.1",
+    "dotenv": "^0.4.0",
+    "errorhandler": "^1.4.3",
+    "express": "^4.13.4",
+    "express-jwt": "^0.3.2",
+    "express-session": "^1.14.1",
+    "fb": "^1.1.1",
+    "flat": "^2.0.1",
+    "fs": "0.0.1-security",
+    "jsonwebtoken": "^1.3.0",
+    "letsencrypt-express": "^2.0.5",
+    "lodash": "^2.4.2",
+    "minimist": "^1.2.0",
+    "moment": "^2.15.2",
+    "moment-timezone": "^0.5.7",
+    "mongoose": "^4.6.3",
+    "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
+    "request": "^2.75.0"
+  }
+}

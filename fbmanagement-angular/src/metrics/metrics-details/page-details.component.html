@@ -1,0 +1,20 @@
+<navigation></navigation>
+<div class="container">
+  <div class="row" *ngIf="info">
+    <alert type="success" dismissible="true">{{info}}</alert>
+  </div>
+  <progress-bar-custom *ngIf="synchronizing"></progress-bar-custom>
+  <div class="row" *ngIf="page.length === 0">
+    <alert type="warning">
+      <div class="col-md-10">
+        <p><em>No data found for this page!</em></p>
+      </div>
+      <button class="btn btn-warning" (click)="syncPage(page_id)">Sync Now</button>
+    </alert>
+  </div>
+  <div class="row">
+    <pre>
+      {{page | json}}
+    </pre>
+  </div>
+</div>

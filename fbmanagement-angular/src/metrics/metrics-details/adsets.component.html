@@ -1,0 +1,41 @@
+<navigation></navigation>
+<div class="container">
+  <div class="jumbotron">
+    <h4>Your Adsets</h4>
+  </div>
+  <alert type="info" dismissible="true">
+    <div class="col-md-10">
+      <p><i class="fa fa-refresh" aria-hidden="true"></i> <em>Last Synchronization {{lastSynced | date:'medium'}}</em></p>
+    </div>
+    <button class="btn btn-warning" (click)="syncAdAccount(account_id)">Sync Now</button>
+  </alert>
+  <div class="card" *ngFor="let campaign of adsets">
+    <div class="card-block">
+      <div class="card-title">{{campaign.campaign_name}}</div>
+    </div>
+    <div class="card-block">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <i class="fa fa-user" aria-hidden="true"></i> {{campaign.account_name}}
+        </li>
+        <li class="list-group-item" [style.background]="'green'">
+          <i class="fa fa-eye" aria-hidden="true"></i> Impressions {{campaign.unique_impressions}}
+        </li>
+        <li class="list-group-item">
+          <i class="fa fa-flag" aria-hidden="true"></i> Reach {{campaign.reach}}
+        </li>
+        <li class="list-group-item">
+          <i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks {{campaign.clicks}}
+        </li>
+        <li class="list-group-item">
+          <i class="fa fa-bullseye" aria-hidden="true"></i> {{campaign.objective}}
+        </li>
+      </ul>
+      <div class="card-block">
+        <a routerLink="/campaign/{{campaign.campaign_id}}" class="btn btn-success">
+              campaign details
+            </a>
+      </div>
+    </div>
+  </div>
+</div>

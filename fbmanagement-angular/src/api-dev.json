@@ -1,0 +1,14 @@
+{
+  "login": "https://fbmanagement.mjdev.eu:3001/auth/facebook",
+  "user_info": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/userInfo",
+  "sync_ad_account": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/syncAdAccount/",
+  "sync_ad_account_for_date_range": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/syncAdAccountForDateRange/",
+  "sync_ad_account_for_date_range_type": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/syncAdAccountForDateRangeType/",
+  "sync_page": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/syncPage/",
+  "ad_account_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/adAccountDetails/",
+  "page_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/pageDetails/",
+  "post_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/postDetails/",
+  "ad_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/adDetails/",
+  "adset_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/adsetDetails/",
+  "campaign_details": "https://fbmanagement.mjdev.eu:3001/api/protected/fbApi/campaignDetails/"
+}

@@ -1,0 +1,260 @@
+<navigation></navigation>
+<div class="container">
+  <div class="jumbotron">
+    <h4>Your Campaigns</h4>
+  </div>
+  <alert type="info" dismissible="true">
+    <div class="col-md-10">
+      <p><i class="fa fa-refresh" aria-hidden="true"></i> <em>Last Synchronization {{lastSynced | date:'medium'}}</em></p>
+    </div>
+    <button class="btn btn-warning" (click)="syncAdAccount(account_id)">Sync Now</button>
+  </alert>
+  <div class="card" *ngFor="let campaign of campaigns">
+    <div class="card-block btn-primary">
+      <div class="row">
+        <div class="col-xs-2">
+          <i class="fa fa-user fa-x2" aria-hidden="true"></i> {{campaign.account_name}}
+        </div>
+        <div class="col-xs-10">
+          <div class="card-title">{{campaign.campaign_name}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.effective_status}}">
+              <i class="fa fa-spinner" aria-hidden="true"></i> Status</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.reach}}">
+              <i class="fa fa-users" aria-hidden="true"></i> Reach</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_impressions}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> Impressions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_impressions}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> Unique Impressions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.clicks}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.objective}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> Objective</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.spend}}">
+              <span>Spent</span>
+              <span class="tag tag-default" (mouseover)="setCurrency(campaign.currency.user_currency)" [ngStyle]="{'cursor': 'pointer'}">{{campaign.currency.user_currency}}</span>
+              <span class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
+              <span class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
+              <span class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.effective_status}}</span></td>
+            <td><span class="tag tag-info">{{campaign.reach}}</span></td>
+            <td><span class="tag tag-info">{{campaign.impressions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_impressions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.objective}}</span></td>
+            <td>
+              <span [style.color]="'green'" *ngIf="preferred_currency === campaign.currency.user_currency">
+                {{campaign.currency.user_currency + '' + campaign.spend }}
+              </span>
+              <span [style.color]="'green'" *ngIf="preferred_currency !== campaign.currency.user_currency">
+                {{campaign.spend | currencyConverter:campaign.currency.user_currency:preferred_currency | async}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.created_time}}">
+              <i class="fa fa-clock-o" aria-hidden="true"></i> Created time</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.updated_time}}">
+              <i class="fa fa-users" aria-hidden="true"></i> Updated time</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.start_time}}">
+              <i class="fa fa-spinner" aria-hidden="true"></i> Start time</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.stop_time}}">
+              <i class="fa fa-clock-o" aria-hidden="true"></i> Stop time</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.date_start}}">
+              <i class="fa fa-spinner" aria-hidden="true"></i> Date Start</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.date_stop}}">
+              <i class="fa fa-clock-o" aria-hidden="true"></i> Date Stop</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.created_time| date:'medium'}}</span></td>
+            <td><span class="tag tag-info">{{campaign.updated_time| date:'medium'}}</span></td>
+            <td><span class="tag tag-info">{{campaign.start_time| date:'medium'}}</span></td>
+            <td><span class="tag tag-info">{{campaign.stop_time| date:'medium'}}</span></td>
+            <td><span class="tag tag-info">{{campaign.date_start| date:'medium'}}</span></td>
+            <td><span class="tag tag-info">{{campaign.date_stop| date:'medium'}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.app_store_clicks}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> a_s_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.canvas_avg_view_time}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> c_a_view_time</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.canvas_avg_view_percent}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> c_a_view_percent</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.call_to_action_clicks}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> c_t_action_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_estimated_ad_recallers}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> c_p_e_ad_recallers</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_inline_link_click}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> c_p_i_link_click</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.app_store_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.canvas_avg_view_time}}</span></td>
+            <td><span class="tag tag-info">{{campaign.canvas_avg_view_percent}}</span></td>
+            <td><span class="tag tag-info">{{campaign.call_to_action_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cost_per_estimated_ad_recallers}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cost_per_inline_link_click}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_inline_post_engagement}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> c_p_i_post_engagement</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_unique_click}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> c_p_u_click</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_unique_inline_link_click}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> c_p_u_i_link_click</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cost_per_total_action}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> c_p_total_action</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cpc}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> cpc</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cpm}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> cpm</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.cpp}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> cpp</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.ctr}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> ctr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.cost_per_inline_post_engagement}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cost_per_unique_click}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cost_per_unique_inline_link_click}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cost_per_total_action}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cpc}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cpm}}</span></td>
+            <td><span class="tag tag-info">{{campaign.cpp}}</span></td>
+            <td><span class="tag tag-info">{{campaign.ctr}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.deeplink_clicks}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> d_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.estimated_ad_recall_rate}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> e_a_r_rate</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.estimated_ad_recallers}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> e_a_recallers</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.frequency}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> frequency</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.inline_link_click_ctr}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> i_l_click_ctr</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.inline_link_clicks}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> i_l_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.inline_post_engagement}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> i_post_engagement</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.social_clicks}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> s_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.social_impressions}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> s_impressions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.deeplink_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.estimated_ad_recall_rate}}</span></td>
+            <td><span class="tag tag-info">{{campaign.estimated_ad_recallers}}</span></td>
+            <td><span class="tag tag-info">{{campaign.frequency}}</span></td>
+            <td><span class="tag tag-info">{{campaign.inline_link_click_ctr}}</span></td>
+            <td><span class="tag tag-info">{{campaign.inline_link_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.inline_post_engagement}}</span></td>
+            <td><span class="tag tag-info">{{campaign.social_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.social_impressions}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.social_reach}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> s_reach</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.social_spend}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> s_spend</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.total_action_value}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> t_a_value</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.total_actions}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> t_actions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.total_unique_actions}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> t_u_actions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_clicks}}">
+              <i class="fa fa-eye" aria-hidden="true"></i> u_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_ctr}}">
+              <i class="fa fa-mouse-pointer" aria-hidden="true"></i> u_ctr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.social_reach}}</span></td>
+            <td><span class="tag tag-info">{{campaign.social_spend}}</span></td>
+            <td><span class="tag tag-info">{{campaign.total_action_value}}</span></td>
+            <td><span class="tag tag-info">{{campaign.total_actions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.total_unique_actions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_ctr}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-sm table-bordered">
+        <thead class="bg-info">
+          <tr class="text-xs-center">
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_impressions}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_impressions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_inline_link_click_ctr}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_i_l_click_ctr</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_inline_link_clicks}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_i_l_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_link_clicks_ctr}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_l_clicks_ctr</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_social_clicks}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_s_clicks</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.unique_social_impressions}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> u_s_impressions</th>
+            <th data-toggle="tooltip" data-placement="top" title="{{campaign_insights_tooltips.website_clicks}}">
+              <i class="fa fa-bullseye" aria-hidden="true"></i> w_clicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-info">{{campaign.unique_impressions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_inline_link_click_ctr}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_inline_link_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_link_clicks_ctr}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_social_clicks}}</span></td>
+            <td><span class="tag tag-info">{{campaign.unique_social_impressions}}</span></td>
+            <td><span class="tag tag-info">{{campaign.website_clicks}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

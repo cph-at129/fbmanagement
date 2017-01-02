@@ -1,0 +1,161 @@
+<!--<div class="container-fixed" *ngIf="!userInfo">
+  <div class="row text-xs-center">
+    <h1>Loading... Please wait</h1>
+  </div>
+</div>-->
+<div *ngIf="userInfo">
+  <navigation></navigation>
+  <div class="container">
+    <div class="row" *ngIf="error || info">
+      <alert type="danger" *ngIf="error" dismissible="true">{{error}}</alert>
+      <alert type="success" *ngIf="info" dismissible="true">{{info}}</alert>
+    </div>
+    <div *ngIf="synchronizing">
+      <progress-bar-custom></progress-bar-custom>
+    </div>
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-xs-4 welcomeUserSection">
+          <h4>Welcome {{userInfo.name}}</h4>
+          <p>Manage your pages, posts and campaigns</p>
+        </div>
+        <div class="col-xs-8 bestPerformingSection" *ngIf="bestPerformanceAd">
+          <h4 class="text-xs-center">Your Best Performing Ad</h4>
+          <div class="card">
+            <div class="card-block">
+              <div class="row">
+                <div class="col-xs-2">
+                  <img class="card-img-top" src="{{bestPerformanceAd.ad_creatives.thumbnail_url}}" alt="post image">
+                </div>
+                <div class="col-xs-10">
+                  <div class="card-title">{{bestPerformanceAd.ad_name| slice:5}}</div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                  <thead>
+                    <tr class="text-xs-center">
+                      <th><i class="fa fa-spinner" aria-hidden="true"></i> Status</th>
+                      <th><i class="fa fa-clock-o" aria-hidden="true"></i> Created</th>
+                      <th><i class="fa fa-users" aria-hidden="true"></i> Reach</th>
+                      <th><i class="fa fa-eye" aria-hidden="true"></i> Impressions</th>
+                      <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="tag tag-info">{{bestPerformanceAd.status}}</span></td>
+                      <td><span class="tag tag-info">{{bestPerformanceAd.created_time| date:'medium'}}</span></td>
+                      <td><span class="tag tag-info">{{bestPerformanceAd.reach}}</span></td>
+                      <td><span class="tag tag-info">{{bestPerformanceAd.unique_impressions}}</span></td>
+                      <td><span class="tag tag-info">{{bestPerformanceAd.clicks}}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-block text-xs-center">
+                <a routerLink="/ad/{{bestPerformanceAd.ad_id}}" class="btn btn-outline-primary btn-sm">Ad</a>
+                <a routerLink="/post/{{bestPerformanceAd.ad_creatives.object_story_id}}" class="btn btn-outline-secondary btn-sm">Post</a>
+                <a routerLink="/campaign/{{bestPerformanceAd.campaign_id}}" class="btn btn-outline-info btn-sm">Campaign</a>
+                <a href="{{bestPerformanceAd.ad_creatives.instagram_permalink_url}}" class="btn btn-outline-warning btn-sm" target="_blank">Instagram</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 card">
+        <div class="card-block btn-primary" (click)="isCollapsedAccounts = !isCollapsedAccounts">
+          <div class="card-title">
+            <h3>Your ad accounts</h3>
+          </div>
+        </div>
+        <div class="card card-block" [collapse]="isCollapsedAccounts" *ngFor="let account of userInfo.adAccountsInfo">
+          <div class="card-title">
+            <div class="col-xs-9">
+              <h4>{{account.name}}</h4>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr class="text-xs-center">
+                  <th><i class="fa fa-users" aria-hidden="true"></i>City</th>
+                  <th><i class="fa fa-eye" aria-hidden="true"></i>Currency</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tag tag-info">{{account.business_city}}</span></td>
+                  <td><span class="tag tag-info">{{account.currency}}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-block">
+            <a routerLink="/adAccount/{{account.id}}" class="btn btn-outline-primary btn-sm">Account Details</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 card">
+        <div class="card-block btn-primary" (click)="isCollapsedCampaigns = !isCollapsedCampaigns">
+          <div class="card-title">
+            <h3>Your campaigns</h3>
+          </div>
+        </div>
+        <div class="card-block" [collapse]="isCollapsedCampaigns">
+          <div class="card-block" *ngFor="let campaign of campaigns">
+            <div class="card-title">
+              <div class="col-xs-9">
+                <h4>{{campaign.name}}</h4>
+              </div>
+              <div class="col-xs-3">
+                <a routerLink="/campaign/{{campaign.id}}" class="btn btn-outline-primary btn-sm">Campaign Details</a>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead>
+                  <tr class="text-xs-center">
+                    <th><i class="fa fa-spinner" aria-hidden="true"></i> Status</th>
+                    <th><i class="fa fa-clock-o" aria-hidden="true"></i> Created</th>
+                    <th><i class="fa fa-users" aria-hidden="true"></i> Reach</th>
+                    <th><i class="fa fa-eye" aria-hidden="true"></i> Impressions</th>
+                    <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-xs-center">
+                      <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'green'}" *ngIf="campaign.effective_status === 'ACTIVE'"></i>
+                      <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'red'}" *ngIf="campaign.effective_status === 'PAUSED'"></i>
+                    </td>
+                    <td><span class="tag tag-info">{{campaign.created_time| date:'medium'}}</span></td>
+                    <td><span class="tag tag-info">{{campaign.reach}}</span></td>
+                    <td><span class="tag tag-info">{{campaign.unique_impressions}}</span></td>
+                    <td><span class="tag tag-info">{{campaign.clicks}}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 card">
+        <div class="card-block btn-primary" (click)="isCollapsed = !isCollapsed">
+          <div class="card-title">
+            <h3>Your pages</h3>
+          </div>
+        </div>
+        <div class="card-block" [collapse]="isCollapsed">
+          <progress-bar-custom *ngIf="synchronizingPages"></progress-bar-custom>
+          <div class="list-group">
+            <div *ngFor="let page of userInfo.pages">
+              <a class="list-group-item  list-group-item-action" routerLink="/page/{{page.id}}">{{page.name}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

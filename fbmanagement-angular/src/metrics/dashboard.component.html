@@ -1,0 +1,192 @@
+<navigation></navigation>
+<div class="container">
+  <alert *ngIf="error" type="danger" dismissible="true">{{ error }}</alert>
+  <div class="jumbotron text-xs-center">
+    <h2>Dashboard</h2>
+  </div>
+  <div class="card col-xs-12">
+    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+      <div class="card-title text-xs-center">
+        <p>Ad Accounts</p>
+      </div>
+    </div>
+    <div class="card col-xs-4">
+      <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+        <div class="card-title text-xs-center">
+          <p>Please select an account</p>
+        </div>
+      </div>
+      <div class="card-block" *ngIf="adAccounts.length > 0">
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-action" *ngFor="let account of adAccounts" (click)="selectAccount(account)">{{account.name}}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card col-xs-8" *ngIf="selectedAccount">
+      <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+        <div class="card-title text-xs-center">
+          <p>{{selectedAccount.name}}</p>
+        </div>
+      </div>
+      <div class="card-block col-xs-4">
+        <blockquote class="card-blockquote ">
+          <footer>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">Choose date range</button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button type="button" class="btn btn-default dropdown-item" (click)="setDatePickerType('ranges')">Date Range Picker</button>
+                <button type="button" class="btn btn-default dropdown-item" (click)="setDatePickerType('custom')">Custom Range Picker</button>
+              </div>
+            </div>
+            <div class="dropdown" *ngIf="ads.length > 0 || adsets.length > 0 || campaigns.length > 0">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">Choose type of data</button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button type="button" class="btn btn-default dropdown-item" (click)="setItemsType('ads')">Ads</button>
+                <button type="button" class="btn btn-default dropdown-item" (click)="setItemsType('adsets')">Adsets</button>
+                <button type="button" class="btn btn-default dropdown-item" (click)="setItemsType('campaigns')">Campaigns</button>
+              </div>
+            </div>
+          </footer>
+        </blockquote>
+        <div class="card-block">
+          <button type="button" class="btn btn-primary btn-lg" [disabled]="!(syncDateRangeFrom && syncDateRangeUntil) || !syncDateRangeType"
+            *ngIf="!(syncDateRangeFrom && syncDateRangeUntil) && !syncDateRangeType">Get data</button>
+          <button type="button" class="btn btn-primary btn-lg" [disabled]="!(syncDateRangeFrom && syncDateRangeUntil)" *ngIf="syncDateRangeFrom && syncDateRangeUntil"
+            (click)="syncAdAccountForDateRange(selectedAccount.id)">Get data</button>
+          <button type="button" class="btn btn-primary btn-lg" [disabled]="!syncDateRangeType" *ngIf="syncDateRangeType" (click)="syncAdAccountForDateRangeType(selectedAccount.id)">Get data</button>
+        </div>
+      </div>
+      <div class="card-block" *ngIf="datePickerType">
+        <div *ngIf="datePickerType === 'ranges' && !syncDateRangeType">
+          <blockquote class="card-blockquote col-xs-4">
+            <p>Choose range type</p>
+            <footer>
+              <date-range-picker [datePickerType]="datePickerType" (onPickDateRangeType)="onPickedDateRangeType($event)"></date-range-picker>
+            </footer>
+          </blockquote>
+        </div>
+        <div *ngIf="datePickerType === 'custom'">
+          <blockquote class="card-blockquote col-xs-4" *ngIf="!syncDateRangeFrom">
+            <p>Date Range From</p>
+            <footer>
+              <date-range-picker [datePickerType]="datePickerType" (onPickDate)="onPickedDateRangeFrom($event)"></date-range-picker>
+            </footer>
+          </blockquote>
+          <blockquote class="card-blockquote" *ngIf="!syncDateRangeUntil && syncDateRangeFrom">
+            <p>Date Range Until</p>
+            <footer>
+              <date-range-picker [datePickerType]="datePickerType" (onPickDate)="onPickedDateRangeUntil($event)"></date-range-picker>
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card col-xs-12" *ngIf="itemsType !== ''">
+    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+      <div class="card-title">
+        <p>Data</p>
+      </div>
+    </div>
+    <div class="card-block" *ngIf="itemsType === 'ads' && ads.length > 0">
+      <metrics-ads [ads]="ads" (onFilter)="onFiltered($event)"></metrics-ads>
+    </div>
+    <!--<div *ngIf="itemsType === 'adsets'">
+      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered()></metrics-adsets>
+    </div>
+    <div *ngIf="itemsType === 'campaigns'">
+      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered()></metrics-campaigns>
+    </div>-->
+  </div>
+</div>
+<!--</div>-->
+<!--<div class="row">
+    <div class="col-md-12 bg-default panel panel-primary">
+      <div class="panel-heading">Campaigns</div>
+      <div class="panel-body">
+        <div *ngFor="let campaign of insightCampaignMetrics">
+          <div class="col-md-4 bg-default panel panel-primary campaignPanel">
+            <div class="panel-heading">{{campaign.campaign_name}}</div>
+            <div class="panel-body">
+              <ul class="list-group">
+                <li class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>{{campaign.account_name}}</li>
+                <li class="list-group-item"><span class="badge">{{campaign.reach}}</span><span class="glyphicon glyphicon-star" aria-hidden="true"></span>Reach</li>
+                <li class="list-group-item"><span class="badge">{{campaign.impressions}}</span><span class="glyphicon glyphicon-fire" aria-hidden="true"></span><span>Impressions</span></li>
+                <li class="list-group-item"><span class="badge">{{campaign.objective}}</span><span class="glyphicon glyphicon-tag" aria-hidden="true"></span>Objective</li>
+                <li class="list-group-item"><span class="badge">{{campaign.spend}}</span><span class="glyphicon glyphicon-euro" aria-hidden="true"></span>Spend</li>
+                <li class="list-group-item"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Last updated: {{lastUpdated | date:'medium'}}</li>
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-outline-warning btn-sm" (click)="seeCampaignDetails(campaign.campaign_id)">See Campaign Details</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel-primary">
+              <div class="panel-heading">Ad Sets in "{{campaign.campaign_name}}" campaign</div>
+              <div class="panel-body">
+                <ul class="list-group">
+                  <li class="list-group-item" *ngFor="let adset of insightAdsetMetrics">
+                    <button type="button" class="btn btn-outline-success btn-xs" (click)="viewAdsetDetails(adset)">{{adset.adset_name}} - {{adset.objective}}</button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="panel-primary">
+              <div class="panel-heading">Ads in "{{campaign.campaign_name}}" campaign</div>
+              <div class="panel-body">
+                <ul class="list-group">
+                  <li class="list-group-item" *ngFor="let ad of insightAdMetrics;let i=index">
+                    <button type="button" class="btn btn-outline-success btn-xs" (click)="viewAdDetails(ad)">Ad {{i+1}} - {{ad.objective}}</button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 panel-primary">
+            <div class="panel-heading">Choose Chart Type</div>
+            <div class="panel-body">
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-outline-success btn-xs" (click)="setChartType('line-video')">Ad video views charts</button>
+                </li>
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-outline-warning btn-xs" (click)="setChartType('bar')">Bar Chart</button>
+                </li>
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-outline-info btn-xs" (click)="setChartType('pie')">Pie Chart</button>
+                </li>
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-outline-info btn-xs" (click)="setChartType('all')">All Charts</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 panel panel-primary" *ngIf="chartType !== 'all' && chartType !== ''">
+        <div class="panel-heading">{{chartType}} Charts</div>
+        <div class="panel-body">
+          <metrics-line-chart [adData]="insightAdMetrics" *ngIf="chartType === 'line-video'"></metrics-line-chart>
+          <metrics-bar-chart [adData]="insightAdMetrics" *ngIf="chartType === 'bar'"></metrics-bar-chart>
+          <metrics-pie-chart [adData]="insightAdMetrics" *ngIf="chartType === 'pie'"></metrics-pie-chart>
+        </div>
+      </div>
+      <div class="col-md-12 panel panel-primary" *ngIf="chartType === 'all'">
+        <div class="panel-heading">All Charts</div>
+        <div class="panel-body">
+          <div class="col-md-12">
+            <metrics-line-chart [adData]="insightAdMetrics"></metrics-line-chart>
+          </div>
+          <div class="col-md-12">
+            <metrics-bar-chart [adData]="insightAdMetrics"></metrics-bar-chart>
+          </div>
+          <div class="col-md-12">
+            <metrics-pie-chart [adData]="insightAdMetrics"></metrics-pie-chart>
+          </div>
+        </div>
+      </div>
+    </div>-->
+<!--</div>-->
