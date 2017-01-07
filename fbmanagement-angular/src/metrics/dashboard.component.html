@@ -1,9 +1,9 @@
 <navigation></navigation>
 <div class="container">
   <alert *ngIf="error" type="danger" dismissible="true">{{ error }}</alert>
-  <div class="jumbotron text-xs-center">
+  <alert class="text-xs-center" type="info">
     <h2>Dashboard</h2>
-  </div>
+  </alert>
   <div class="card col-xs-12">
     <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
       <div class="card-title text-xs-center">
@@ -39,7 +39,7 @@
                 <button type="button" class="btn btn-default dropdown-item" (click)="setDatePickerType('custom')">Custom Range Picker</button>
               </div>
             </div>
-            <div class="dropdown" *ngIf="ads.length > 0 || adsets.length > 0 || campaigns.length > 0">
+            <div class="dropdown" *ngIf="(ads.length > 0 || adsets.length > 0 || campaigns.length > 0) && !showOldData">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">Choose type of data</button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -52,10 +52,10 @@
         </blockquote>
         <div class="card-block">
           <button type="button" class="btn btn-primary btn-lg" [disabled]="!(syncDateRangeFrom && syncDateRangeUntil) || !syncDateRangeType"
-            *ngIf="!(syncDateRangeFrom && syncDateRangeUntil) && !syncDateRangeType">Get data</button>
+            *ngIf="!(syncDateRangeFrom && syncDateRangeUntil) && !syncDateRangeType">Sync data</button>
           <button type="button" class="btn btn-primary btn-lg" [disabled]="!(syncDateRangeFrom && syncDateRangeUntil)" *ngIf="syncDateRangeFrom && syncDateRangeUntil"
-            (click)="syncAdAccountForDateRange(selectedAccount.id)">Get data</button>
-          <button type="button" class="btn btn-primary btn-lg" [disabled]="!syncDateRangeType" *ngIf="syncDateRangeType" (click)="syncAdAccountForDateRangeType(selectedAccount.id)">Get data</button>
+            (click)="syncAdAccountForDateRange(selectedAccount.id)">Sync data</button>
+          <button type="button" class="btn btn-primary btn-lg" [disabled]="!syncDateRangeType" *ngIf="syncDateRangeType" (click)="syncAdAccountForDateRangeType(selectedAccount.id)">Sync data</button>
         </div>
       </div>
       <div class="card-block" *ngIf="datePickerType">
@@ -74,7 +74,7 @@
               <date-range-picker [datePickerType]="datePickerType" (onPickDate)="onPickedDateRangeFrom($event)"></date-range-picker>
             </footer>
           </blockquote>
-          <blockquote class="card-blockquote" *ngIf="!syncDateRangeUntil && syncDateRangeFrom">
+          <blockquote class="card-blockquote" *ngIf="showDateRangeUntil && !syncDateRangeUntil">
             <p>Date Range Until</p>
             <footer>
               <date-range-picker [datePickerType]="datePickerType" (onPickDate)="onPickedDateRangeUntil($event)"></date-range-picker>
@@ -84,10 +84,31 @@
       </div>
     </div>
   </div>
-  <div class="card col-xs-12" *ngIf="itemsType !== ''">
+  <div class="card col-xs-12" *ngIf="showOldData">
     <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
       <div class="card-title">
-        <p>Data</p>
+        <p>Old Data</p>
+      </div>
+    </div>
+    <div class="card-block text-xs-center">
+      <button type="button" class="btn btn-primary" (click)="setItemsType('ads')">Ads</button>
+      <button type="button" class="btn btn-primary" (click)="setItemsType('adsets')">Adsets</button>
+      <button type="button" class="btn btn-primary" (click)="setItemsType('campaigns')">Campaigns</button>
+    </div>
+    <div class="card-block" *ngIf="itemsType === 'ads' && ads.length > 0">
+      <metrics-ads [ads]="ads" (onFilter)="onFiltered($event)"></metrics-ads>
+    </div>
+    <!--<div *ngIf="itemsType === 'adsets'">
+      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered()></metrics-adsets>
+    </div>
+    <div *ngIf="itemsType === 'campaigns'">
+      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered()></metrics-campaigns>
+    </div>-->
+  </div>
+  <div class="card col-xs-12" *ngIf="itemsType !== '' && !showOldData">
+    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+      <div class="card-title">
+        <p>New Data</p>
       </div>
     </div>
     <div class="card-block" *ngIf="itemsType === 'ads' && ads.length > 0">

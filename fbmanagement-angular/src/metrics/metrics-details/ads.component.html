@@ -21,7 +21,7 @@
   <div class="card card-block">
     <div class="card" *ngFor="let ad of ads | search:'ad':searchText">
       <div class="card-block">
-        <div class="col-xs-2">
+        <div class="col-xs-2" *ngIf="ad.ad_creatives">
           <img class="card-img-top" src="{{ad.ad_creatives.thumbnail_url}}" alt="post image">
         </div>
         <div class="col-xs-10">
@@ -75,7 +75,7 @@
           </tbody>
         </table>
       </div>
-      <div class="card-block">
+      <div class="card-block" *ngIf="ad.ad_creatives">
         <a routerLink="/post/{{ad.ad_creatives.object_story_id}}" class="btn btn-primary">Page Post</a>
         <a href="{{ad.ad_creatives.instagram_permalink_url}}" class="btn btn-primary" target="_blank">Instagram Post</a>
       </div>

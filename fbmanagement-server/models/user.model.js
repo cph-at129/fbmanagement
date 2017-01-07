@@ -15,6 +15,8 @@ var userSchema = mongoose.Schema({
     refreshToken: String,
     name: String,
     email: String,
+    currency: {},
+    adAccounts: []
   }
 });
 

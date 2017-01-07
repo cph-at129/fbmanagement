@@ -34,32 +34,28 @@ export class HomeComponent implements OnInit {
     private ref: ChangeDetectorRef) {
   }
 
-  syncAll() {
-    state_syncedAll = true;
-    this.fbmanagerService.getUser()
-      .then((userInfo) => {
-        if (!userInfo || Object.keys(userInfo).length === 0) {
-          this.fbmanagerService.logout();
-        } else {
-          this.userInfo = userInfo;
-          userInfo.adAccounts.forEach((adAccount) => {
-            this.syncAdAccount(adAccount.id);
-          });
-          userInfo.pages.forEach((page)=>{
-            this.syncPage(page.id);
-          });
-        }
-      })
-  }
+  // syncAll() {
+  //   state_syncedAll = true;
+  //   this.fbmanagerService.getUser()
+  //     .then((userInfo) => {
+  //       if (!userInfo || Object.keys(userInfo).length === 0) {
+  //         this.fbmanagerService.logout();
+  //       } else {
+  //         this.userInfo = userInfo;
+  //         userInfo.adAccounts.forEach((adAccount) => {
+  //           this.syncAdAccount(adAccount.id);
+  //         });
+  //         userInfo.pages.forEach((page)=>{
+  //           this.syncPage(page.id);
+  //         });
+  //       }
+  //     })
+  // }
 
   ngOnInit() {
     this.fbmanagerService.loginCheck();
-    this.clearAdAccount();
-    if(!state_syncedAll){
-      this.syncAll();
-    }else{
-      this.getUser();
-    }
+    // this.clearAdAccount();
+    this.getUser();
   }
 
   getUser() {

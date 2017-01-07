@@ -26,6 +26,8 @@ export class DashboardComponent implements OnInit {
   syncDateRangeFrom: Date;
   syncDateRangeUntil: Date;
   syncDateRangeType: String;
+  showOldData = false;
+  showDateRangeUntil = false;
 
   constructor(
     private router: Router,
@@ -50,17 +52,16 @@ export class DashboardComponent implements OnInit {
       })
   }
 
-  // getAdAccount(account_id, itemsType) {
-  //   this.clearAdAccount();
-  //   this.selectedAcccountId = account_id;
-  //   this.metricsService.getAdAccount(account_id)
-  //     .then((adAccount) => {
-  //       if (adAccount) {
-  //         this.initAdAccount(adAccount);
-
-  //       }
-  //     })
-  // }
+  getAdAccount(account_id, itemsType) {
+    this.clearAdAccount();
+    this.metricsService.getAdAccount(account_id)
+      .then((adAccount) => {
+        if (adAccount) {
+          this.initData(adAccount);
+          this.showOldData = true;
+        }
+      })
+  }
 
   syncAdAccount(id: string) {
     this.metricsService.syncAdAccount(id)
@@ -70,27 +71,24 @@ export class DashboardComponent implements OnInit {
 
   selectAccount(account: any){
     this.selectedAccount = account;
+    this.getAdAccount(this.selectedAccount.id, this.itemsType);
   }
 
   syncAdAccountForDateRange(id: string) {
-    console.log('syncAdAccountForDateRange');
-    console.log(id + ' => ' + this.syncDateRangeFrom + ' => ' + this.syncDateRangeUntil);
+    this.showOldData = false;
     this.metricsService.syncAdAccountForDateRange(id, this.syncDateRangeFrom, this.syncDateRangeUntil)
       .then((data) => {
         this.clearDateRangeValues();
         this.initData(data);
-        console.log(data);
       })
   }
 
   syncAdAccountForDateRangeType(id: string) {
-    console.log('syncAdAccountForDateRangeType');
-    console.log(id + ' => ' + this.syncDateRangeType);
+    this.showOldData = false;
     this.metricsService.syncAdAccountForDateRangeType(id, this.syncDateRangeType)
       .then((data) => {
         this.clearDateRangeValues();
         this.initData(data);
-        console.log(data);
       })
   }
 
@@ -119,13 +117,12 @@ export class DashboardComponent implements OnInit {
   onPickedDateRangeFrom(event: Date) {
     this.ref.detectChanges();
     this.syncDateRangeFrom = event;
-    console.log(this.syncDateRangeFrom);
+    this.showDateRangeUntil = true;
   }
 
   onPickedDateRangeUntil(event: Date) {
     this.ref.detectChanges();
     this.syncDateRangeUntil = event;
-    console.log(this.syncDateRangeUntil);
   }
 
   onPickedDateRangeType(event: string) {
@@ -147,9 +144,9 @@ export class DashboardComponent implements OnInit {
   }
 
   initData(data) {
-    this.campaigns = data.campaignInsights;
-    this.adsets = data.adsetInsights;
-    this.ads = data.adInsights;
+    this.campaigns = data.campaigns;
+    this.adsets = data.adsets;
+    this.ads = data.ads;
   }
 
   clearAdAccount() {

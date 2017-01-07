@@ -13,7 +13,7 @@ module.exports = {
   },
   'jwt_secret': 'the_wild_hunt_#m"pQMA7XW>de6nr',
   'session_secret': 'the_wild_hunt_*@pd62@q4xZLEtUM',
-  'mongodb': 'mongodb://ole.corp.mindjumpers.com/fbmanagement',
+  'mongodb': 'mongodb://fbmanager:purplehazee@ds163387.mlab.com:63387/fbmanagement',
   'login_page': 'http://fbmanagement.mjdev.eu:3000/#/login/',
   'login_redirect': 'http://fbmanagement.mjdev.eu:3000/#/doLogin/'
 };

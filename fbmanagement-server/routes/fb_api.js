@@ -43,14 +43,14 @@ exports.getUserInfo = function (user, callback) {
 }
 
 exports.initFacebookUser = function (user, callback) {
-    _initFacebookUser(user, function (error, facebookUser) {
-      if (error) return callback(error, null);
-      callback(null, facebookUser);
-    });
-  }
-  /**
-   * sync ad account now no matter if already syned today
-   */
+  _initFacebookUser(user, function (error, facebookUser) {
+    if (error) return callback(error, null);
+    callback(null, facebookUser);
+  });
+}
+/**
+ * sync ad account now no matter if already syned today
+ */
 exports.syncAdAccountNow = function (account_id, user, callback) {
   now = moment();
   SCAN_ID = now.unix();
@@ -150,27 +150,28 @@ exports.syncPage = function (page_id, user, callback) {
 }
 
 exports.syncPageNow = function (page_id, user, callback) {
-    now = moment();
-    SCAN_ID = now.unix();
-    _initFacebookUser(user, function (err, facebookUser) {
+  now = moment();
+  SCAN_ID = now.unix();
+  _initFacebookUser(user, function (err, facebookUser) {
+    if (err) return callback(err, null);
+    _syncPage(page_id, facebookUser, function (err, pageMetrics) {
       if (err) return callback(err, null);
-      _syncPage(page_id, facebookUser, function (err, pageMetrics) {
+      _savePageMetrics(page_id, pageMetrics, function (err, result) {
         if (err) return callback(err, null);
-        _savePageMetrics(page_id, pageMetrics, function (err, result) {
-          if (err) return callback(err, null);
-          callback(null, result);
-        });
+        callback(null, result);
       });
     });
-  }
-  //********************** HELPER FUNCTIONS *************************
+  });
+}
+//********************** HELPER FUNCTIONS *************************
 
 function _getAdAccountInfo(adAccount, facebookUser, callback) {
   AdAccount.find({
-    'account_id': adAccount.id
+    'id': adAccount.id
   }, (err, adAccountInfo) => {
     if (err) return callback(err, null);
     var filteredAdAccountInfo = _filterLatestSyncedData(adAccountInfo);
+    console.log('Filtered ad account info: ' + filteredAdAccountInfo.length);
     if (filteredAdAccountInfo.length > 0) {
       callback(null, filteredAdAccountInfo[0]);
     } else {
@@ -561,15 +562,15 @@ function _syncAdAccount(account_id, dateRange, facebookUser, callback) {
   parameters.access_token = facebookUser.access_token;
   _syncAdAccountDetails(account_id, facebookUser, function (err) {
     if (err) return callback(err);
-    _syncCampaigns(account_id, dateRange, facebookUser, function (err, campaignInsights) {
+    _syncCampaigns(account_id, dateRange, facebookUser, function (err, campaigns) {
       if (err) return callback(err);
-      syncResult.campaignInsights = campaignInsights;
-      _syncAdsets(account_id, dateRange, facebookUser, function (err, adsetInsights) {
+      syncResult.campaigns = campaigns;
+      _syncAdsets(account_id, dateRange, facebookUser, function (err, adsets) {
         if (err) return callback(err);
-        syncResult.adsetInsights = adsetInsights;
-        _syncAds(account_id, dateRange, facebookUser, function (err, adInsights) {
+        syncResult.adsets = adsets;
+        _syncAds(account_id, dateRange, facebookUser, function (err, ads) {
           if (err) return callback(err);
-          syncResult.adInsights = adInsights;
+          syncResult.ads = ads;
           callback(null, syncResult);
         });
       });
@@ -798,27 +799,38 @@ function _initFacebookUser(user, callback) {
   facebookUser.callbackURL = user.facebook.callbackURL;
   facebookUser.id = user.facebook.id;
   parameters.access_token = facebookUser.access_token;
-  FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
-    facebookUser.currency = currency;
-    FB.api('/' + facebookUser.id + '/accounts', parameters, function (accounts) {
-      if (!accounts || accounts.error) return callback({
-        error: "Error when getting accounts for this user! ->>> " + JSON.stringify(accounts.error)
-      }, null);
-      facebookUser.accounts = accounts.data;
-      FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
-        if (!adaccounts || adaccounts.error) return callback({
-          error: "Error when getting adaccounts for this user! ->>> " + JSON.stringify(accounts.error)
-        }, null);
-        facebookUser.adAccounts = adaccounts.data;
-        FB.api('/' + facebookUser.id + '/permissions', parameters, function (permissions) {
-          if (!permissions || permissions.error) return callback({
-            error: "Error when getting permissions for this user! ->>> " + JSON.stringify(accounts.error)
-          }, null);
-          facebookUser.permissions = permissions.data;
-          callback(null, facebookUser);
+  User.findOne({
+    'facebook.id': facebookUser.id
+  }, (err, dbUser) => {
+    if (err) return callback(err, null);
+    if (dbUser.facebook.adAccounts) {
+      facebookUser.currency = dbUser.facebook.currency;
+      facebookUser.adAccounts = dbUser.facebook.adAccounts;
+      callback(null, facebookUser);
+    } else {
+      FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
+        facebookUser.currency = currency;
+        FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
+          if (!adaccounts || adaccounts.error) return callback(adaccounts.error, null);
+          facebookUser.adAccounts = adaccounts.data;
+          User.update(
+            { 'facebook.id': facebookUser.id },
+            { 'facebook.currency': facebookUser.currency.currency },
+            function (err) {
+              if (err) return callback(err, null);
+              User.update(
+                { 'facebook.id': facebookUser.id },
+                { 'facebook.adAccounts': facebookUser.adAccounts },
+                function (err) {
+                  if (err) return callback(err, null);
+                  callback(null, facebookUser);
+                }
+              );
+            }
+          );
         });
       });
-    });
+    }
   });
 }
 

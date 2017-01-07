@@ -1,20 +1,17 @@
 <div class="container">
-  <nav class="navbar navbar-dark bg-inverse" [style.margin-bottom]="'20px'">
+  <nav class="navbar navbar-dark bg-primary" [style.margin-bottom]="'20px'">
     <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header"
       aria-expanded="false" aria-label="Toggle navigation"></button>
     <a class="navbar-brand" routerLink="/home"><i class="fa fa-facebook-square fa-2x" aria-hidden="true"></i></a>
     <div id="navbar">
       <nav class="nav navbar-nav float-xs-left">
-        <a class="nav-item nav-link" routerLink="/home">Home</a>
-        <a class="nav-item nav-link" routerLink="/dashboard">Dashboard</a>
-        <a class="nav-item nav-link" routerLink="/campaigns">Campaigns</a>
-        <a class="nav-item nav-link" routerLink="/ads">Ads</a>
-        <!--<a class="nav-item nav-link" routerLink="/posts">Posts</a>-->
-        <!--<a class="nav-item nav-link" routerLink="/pages">Pages</a>-->
-        <!--<a class="nav-item nav-link" routerLink="/adAccounts">Ad Accounts</a>-->
+        <a class="nav-item nav-link" routerLinkActive="active" routerLink="/home">Home</a>
+        <a class="nav-item nav-link" routerLinkActive="active" routerLink="/dashboard">Dashboard</a>
+        <a class="nav-item nav-link" routerLinkActive="active" routerLink="/campaigns">Campaigns</a>
+        <a class="nav-item nav-link" routerLinkActive="active" routerLink="/ads">Ads</a>
       </nav>
       <nav class="pull-xs-right">
-        <button class="btn btn-primary" (click)="logout()">Log out</button>
+        <button class="btn btn-default" (click)="logout()">Log out</button>
       </nav>
     </div>
   </nav>

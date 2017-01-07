@@ -16,6 +16,8 @@ export class AdsComponent implements OnInit {
 
   ngOnInit() {
     this.ads = this.adsInput;
+    console.log('On init ads comp');
+    console.log(this.ads);
   }
 
   filterByCriteria(criteria: string) {
