@@ -43,14 +43,14 @@ exports.getUserInfo = function (user, callback) {
 }
 
 exports.initFacebookUser = function (user, callback) {
-  _initFacebookUser(user, function (error, facebookUser) {
-    if (error) return callback(error, null);
-    callback(null, facebookUser);
-  });
-}
-/**
- * sync ad account now no matter if already syned today
- */
+    _initFacebookUser(user, function (error, facebookUser) {
+      if (error) return callback(error, null);
+      callback(null, facebookUser);
+    });
+  }
+  /**
+   * sync ad account now no matter if already syned today
+   */
 exports.syncAdAccountNow = function (account_id, user, callback) {
   now = moment();
   SCAN_ID = now.unix();
@@ -150,20 +150,20 @@ exports.syncPage = function (page_id, user, callback) {
 }
 
 exports.syncPageNow = function (page_id, user, callback) {
-  now = moment();
-  SCAN_ID = now.unix();
-  _initFacebookUser(user, function (err, facebookUser) {
-    if (err) return callback(err, null);
-    _syncPage(page_id, facebookUser, function (err, pageMetrics) {
+    now = moment();
+    SCAN_ID = now.unix();
+    _initFacebookUser(user, function (err, facebookUser) {
       if (err) return callback(err, null);
-      _savePageMetrics(page_id, pageMetrics, function (err, result) {
+      _syncPage(page_id, facebookUser, function (err, pageMetrics) {
         if (err) return callback(err, null);
-        callback(null, result);
+        _savePageMetrics(page_id, pageMetrics, function (err, result) {
+          if (err) return callback(err, null);
+          callback(null, result);
+        });
       });
     });
-  });
-}
-//********************** HELPER FUNCTIONS *************************
+  }
+  //********************** HELPER FUNCTIONS *************************
 
 function _getAdAccountInfo(adAccount, facebookUser, callback) {
   AdAccount.find({
@@ -171,7 +171,6 @@ function _getAdAccountInfo(adAccount, facebookUser, callback) {
   }, (err, adAccountInfo) => {
     if (err) return callback(err, null);
     var filteredAdAccountInfo = _filterLatestSyncedData(adAccountInfo);
-    console.log('Filtered ad account info: ' + filteredAdAccountInfo.length);
     if (filteredAdAccountInfo.length > 0) {
       callback(null, filteredAdAccountInfo[0]);
     } else {
@@ -243,11 +242,7 @@ function _syncPostsMetricsDetails(postsMetrics, facebookUser, callback) {
     FB.api('', 'post', {
       batch: batch
     }, function (batchResponse) {
-      if (!batchResponse || batchResponse.error) {
-        return callback({
-          err: 'Error synchronizing page posts metrics insights'
-        }, null);
-      }
+      if (!batchResponse || batchResponse.error) return callback(batchResponse.error, null);
       batchResponse.forEach(function (b) {
         var insightObj = JSON.parse(b.body);
         if (insightObj.data) {
@@ -294,11 +289,7 @@ function _syncPostsGeneralMetrics(page_id, facebookUser, callback) {
   parameters.show_expired = true;
   parameters.include_hidden = true;
   FB.api('/' + page_id + '/posts', parameters, function (result) {
-    if (!result || result.error) {
-      return callback({
-        err: 'Error synchronizing page posts metrics'
-      }, null);
-    }
+    if (!result || result.error) return callback(result.error, null);
     countData = result.data.length;
     until = querystring.parse(url.parse(result.paging.next).query).until;
     parameters.until = until;
@@ -309,11 +300,7 @@ function _syncPostsGeneralMetrics(page_id, facebookUser, callback) {
       },
       function (callbackPosts) {
         FB.api('/' + page_id + '/posts', parameters, function (result) {
-          if (!result || result.error) {
-            return callback({
-              err: 'Error synchronizing page posts metrics'
-            }, null);
-          }
+          if (!result || result.error) return callback(result.error, null);
           until = querystring.parse(url.parse(result.paging.next).query).until;
           parameters.until = until;
           countData = result.data.length;
@@ -338,21 +325,13 @@ function _syncPageGeneralMetrics(page_id, facebookUser, callback) {
   parameters.fields = config.pageMetrics.pageFields;
   parameters.limit = 100;
   FB.api('/' + page_id, parameters, function (result) {
-    if (!result || result.error) {
-      return callback({
-        err: 'Error synchronizing page general metrics \n ' + JSON.stringify(result.error)
-      }, null);
-    }
+    if (!result || result.error) return callback(result.error, null);
     pageGeneralMetrics.general = result;
     delete parameters.fields;
     parameters.access_token = pageGeneralMetrics.general.access_token;
     parameters.fields = config.pageMetrics.pageRatings;
     FB.api('/' + page_id + '/ratings', parameters, function (result) {
-      if (!result || result.error) {
-        return callback({
-          err: 'Error synchronizing page ratings metrics \n ' + JSON.stringify(result.error)
-        }, null);
-      }
+      if (!result || result.error) return callback(result.error, null);
       pageGeneralMetrics.ratings = result.data;
       var batch = _generatePageInsightsBatch(page_id);
       var batch2 = [];
@@ -366,11 +345,7 @@ function _syncPageGeneralMetrics(page_id, facebookUser, callback) {
       FB.api('', 'post', {
         batch: batch
       }, function (batchResponse) {
-        if (!batchResponse || batchResponse.error) {
-          return callback({
-            err: 'Error synchronizing page insights \n ' + JSON.stringify(batchResponse.error)
-          }, null);
-        }
+        if (!batchResponse || batchResponse.error) return callback(batchResponse.error, null);
         batchResponse.forEach(function (b) {
           var insightObj = JSON.parse(b.body);
           if (insightObj.data) {
@@ -384,11 +359,7 @@ function _syncPageGeneralMetrics(page_id, facebookUser, callback) {
           FB.api('', 'post', {
             batch: batch2
           }, function (batchResponse2) {
-            if (!batchResponse2 || batchResponse2.error) {
-              return callback({
-                err: 'Error synchronizing page posts metrics insights \n ' + JSON.stringify(batchResponse.error)
-              }, null);
-            }
+            if (!batchResponse2 || batchResponse2.error) return callback(batchResponse.error, null);
             batchResponse2.forEach(function (b) {
               var insightObj = JSON.parse(b.body);
               if (insightObj.data) {
@@ -431,11 +402,7 @@ function _syncAdAccountDetails(account_id, facebookUser, callback) {
   parameters.access_token = facebookUser.access_token;
   parameters.fields = config.adAccount.fields;
   FB.api('/' + account_id, parameters, function (adAccountDetails) {
-    if (!adAccountDetails || adAccountDetails.error) {
-      return callback({
-        err: 'Error synchronizing ad account details -> ' + JSON.stringify(adAccountDetails.error)
-      }, null);
-    }
+    if (!adAccountDetails || adAccountDetails.error) return callback(adAccountDetails.error, null);
     AdAccount.find({
       'id': account_id
     }, (err, adAccounts) => {
@@ -460,11 +427,7 @@ function _syncCampaigns(account_id, dateRange, facebookUser, callback) {
   var campaignInsights = [];
   parameters.access_token = facebookUser.access_token;
   FB.api('/' + account_id + '/campaigns', parameters, function (campaigns) {
-    if (!campaigns || campaigns.error) {
-      return callback({
-        err: 'Error synchronizing campaigns -> ' + JSON.stringify(campaigns.error)
-      });
-    }
+    if (!campaigns || campaigns.error) return callback(campaigns.error);
     async.each(campaigns.data, function (campaign, callbackCampaigns) {
       _getInsights(facebookUser, dateRange, campaign.id, 'campaign', function (err, insights) {
         if (err) return callbackCampaigns(err);
@@ -493,11 +456,7 @@ function _syncAdsets(account_id, dateRange, facebookUser, callback) {
   var adsetInsights = [];
   parameters.access_token = facebookUser.access_token;
   FB.api('/' + account_id + '/adsets', parameters, function (adsets) {
-    if (!adsets || adsets.error) {
-      return callback({
-        err: 'Error synchronizing adsets -> ' + JSON.stringify(adsets.error)
-      });
-    }
+    if (!adsets || adsets.error) return callback(adsets.error);
     async.each(adsets.data, function (adset, callbackAdsets) {
       _getInsights(facebookUser, dateRange, adset.id, 'adset', function (err, insights) {
         if (err) return callbackAdsets(err);
@@ -526,11 +485,7 @@ function _syncAds(account_id, dateRange, facebookUser, callback) {
   var adInsights = [];
   parameters.access_token = facebookUser.access_token;
   FB.api('/' + account_id + '/ads', parameters, function (ads) {
-    if (!ads || ads.error) {
-      return callback({
-        err: 'Error synchronizing ads -> ' + JSON.stringify(ads.error)
-      });
-    }
+    if (!ads || ads.error) return callback(ads.error);
     async.each(ads.data, function (ad, callbackAds) {
       _getInsights(facebookUser, dateRange, ad.id, 'ad', function (err, insights) {
         if (err) return callbackAds(err);
@@ -598,8 +553,7 @@ function _getAdAccountDetailsForDateRange(id, dateRange, callback) {
     }, (err, campaigns) => {
       if (err) return callback(err, null);
       if (campaigns.length === 0) return callback(err, result);
-      result.campaigns = campaigns;
-      console.log('Campaigns already synced for this date range.. Returning result from DB');
+      result.campaigns = _checkIfItemEmpty(campaigns);
       AdsetInsightMetrics.find({
         'account_id': account_id,
         'date_start': dateRangeFrom,
@@ -607,8 +561,7 @@ function _getAdAccountDetailsForDateRange(id, dateRange, callback) {
       }, (err, adsets) => {
         if (err) return callback(err, null);
         if (adsets.length === 0) return callback(err, result);
-        console.log('Adsets already synced for this date range.. Returning result from DB');
-        result.adsets = adsets;
+        result.adsets = _checkIfItemEmpty(adsets);
         AdInsightMetrics.find({
           'account_id': account_id,
           'date_start': dateRangeFrom,
@@ -616,8 +569,7 @@ function _getAdAccountDetailsForDateRange(id, dateRange, callback) {
         }, (err, ads) => {
           if (err) return callback(err, null);
           if (adsets.length === 0) return callback(err, result);
-          console.log('Ads already synced for this date range.. Returning result from DB');
-          result.ads = ads;
+          result.ads = _checkIfItemEmpty(ads);
           callback(null, result);
         });
       });
@@ -636,24 +588,43 @@ function _getAdAccountDetails(id, callback) {
     'account_id': account_id
   }, (err, campaigns) => {
     if (err) return callback(err, null);
-    var latestSyncedCampaigns = _filterLatestSyncedData(campaigns);
+    var checkedCampaignsArr = _checkIfItemEmpty(campaigns);
+    var latestSyncedCampaigns = _filterLatestSyncedData(checkedCampaignsArr);
     result.campaigns = latestSyncedCampaigns;
     AdsetInsightMetrics.find({
       'account_id': account_id
     }, (err, adsets) => {
       if (err) return callback(err, null);
-      var latestSyncedAdsets = _filterLatestSyncedData(adsets);
+      var checkedAdsetsArr = _checkIfItemEmpty(adsets);
+      var latestSyncedAdsets = _filterLatestSyncedData(checkedAdsetsArr);
       result.adsets = latestSyncedAdsets;
       AdInsightMetrics.find({
         'account_id': account_id
       }, (err, ads) => {
         if (err) return callback(err, null);
-        var latestSyncedAds = _filterLatestSyncedData(ads);
+        var checkedAdsArr = _checkIfItemEmpty(ads);
+        var latestSyncedAds = _filterLatestSyncedData(checkedAdsArr);
         result.ads = latestSyncedAds;
         callback(null, result);
       });
     });
   });
+}
+/**
+ * checks if an item contains metrics data by
+ * if the field 'date_start' is not empty which indicates that
+ * the item contains data
+ *
+ * returns only array of the items that contain data
+ */
+function _checkIfItemEmpty(data){
+  var checkedItemsArr = [];
+  data.forEach(function(item){
+    if(item.date_start){
+      checkedItemsArr.push(item);
+    }
+  });
+  return checkedItemsArr;
 }
 
 /**
@@ -694,13 +665,11 @@ function _checkIfSynced(id, dateRange, callback) {
           return callback(err, null);
         }
       } else {
-        console.log(`No campaigns found for account ${id}`);
         synced = false;
         callback(null, synced);
       }
     });
   }
-
 }
 
 function _getInsights(facebookUser, dateRange, id, nodeType, callback) {
@@ -713,7 +682,6 @@ function _getInsights(facebookUser, dateRange, id, nodeType, callback) {
   } else {
     if (dateRange.length === 1) {
       parametersDetailsInsights.date_preset = dateRange[0];
-      console.log('Syncing {' + nodeType + '} with id {' + id + '} for date range {' + parametersDetailsInsights.date_preset + '}');
     } else if (dateRange.length === 2) {
       var dateRangeFrom = moment(new Date(dateRange[0])).format('YYYY-MM-DD');
       var dateRangeTo = moment(new Date(dateRange[1])).format('YYYY-MM-DD');
@@ -721,15 +689,12 @@ function _getInsights(facebookUser, dateRange, id, nodeType, callback) {
         since: dateRangeFrom,
         until: dateRangeTo
       };
-      console.log('Syncing {' + nodeType + '} with id {' + id + '} for date range since {' + parametersDetailsInsights.time_range.since + '} until {' + parametersDetailsInsights.time_range.until + '}');
     }
   }
   parametersDetailsInsights.limit = 100;
   parametersDetailsInsights.access_token = facebookUser.access_token;
   parametersGeneralInsights.access_token = facebookUser.access_token;
   parametersAdCreatives.access_token = facebookUser.access_token;
-  //@TODO - get the time range report from the user
-  // parametersDetailsInsights.date_preset = 'today';
 
   if (nodeType === 'campaign') {
     parametersGeneralInsights.fields = config.insightMetrics.campaignFields;
@@ -744,43 +709,21 @@ function _getInsights(facebookUser, dateRange, id, nodeType, callback) {
   }
 
   FB.api('/' + id, parametersGeneralInsights, function (generalInsights) {
-    if (!generalInsights || generalInsights.error) {
-      return callback({
-        err: 'Error synchronizing general insights -> ' + JSON.stringify(generalInsights.error)
-      }, null);
-    }
+    if (!generalInsights || generalInsights.error) return callback(generalInsights.error, null);
     insights.generalInsights = generalInsights;
     if (nodeType === 'ad') {
       FB.api('/' + id + '/insights', parametersDetailsInsights, function (detailsInsights) {
-        if (!detailsInsights || detailsInsights.error) {
-          return callback({
-            err: 'Error synchronizing details insights -> ' + JSON.stringify(detailsInsights.error)
-          }, null);
-        }
-        if (detailsInsights.data.length === 0) {
-          console.log('Empty response when getting insights for -> [ ' + insights.generalInsights.id + ' ]');
-        }
+        if (!detailsInsights || detailsInsights.error) return callback(detailsInsights.error, null);
         insights.detailsInsights = detailsInsights.data[0];
         FB.api('/' + id + '/adcreatives', parametersAdCreatives, function (adCreatives) {
-          if (!adCreatives || adCreatives.error) {
-            return callback({
-              err: 'Error synchronizing ad creatives -> ' + JSON.stringify(adCreatives.error)
-            }, null);
-          }
+          if (!adCreatives || adCreatives.error) return callback(adCreatives.error, null);
           insights.ad_creatives = adCreatives.data[0];
           callback(null, insights);
         });
       });
     } else {
       FB.api('/' + id + '/insights', parametersDetailsInsights, function (detailsInsights) {
-        if (!detailsInsights || detailsInsights.error) {
-          return callback({
-            err: 'Error synchronizing details insights -> ' + JSON.stringify(detailsInsights.error)
-          }, null);
-        }
-        if (detailsInsights.data.length === 0) {
-          console.log('Empty response when getting insights for -> [ ' + insights.generalInsights.id + ' ]');
-        }
+        if (!detailsInsights || detailsInsights.error) return callback(detailsInsights.error, null);
         insights.detailsInsights = detailsInsights.data[0];
         callback(null, insights);
       });
@@ -804,32 +747,38 @@ function _initFacebookUser(user, callback) {
   }, (err, dbUser) => {
     if (err) return callback(err, null);
     if (dbUser.facebook.adAccounts) {
-      facebookUser.currency = dbUser.facebook.currency;
-      facebookUser.adAccounts = dbUser.facebook.adAccounts;
-      callback(null, facebookUser);
-    } else {
-      FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
-        facebookUser.currency = currency;
-        FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
-          if (!adaccounts || adaccounts.error) return callback(adaccounts.error, null);
-          facebookUser.adAccounts = adaccounts.data;
-          User.update(
-            { 'facebook.id': facebookUser.id },
-            { 'facebook.currency': facebookUser.currency.currency },
-            function (err) {
-              if (err) return callback(err, null);
-              User.update(
-                { 'facebook.id': facebookUser.id },
-                { 'facebook.adAccounts': facebookUser.adAccounts },
-                function (err) {
-                  if (err) return callback(err, null);
-                  callback(null, facebookUser);
-                }
-              );
-            }
-          );
+      if (dbUser.facebook.adAccounts.length > 0) {
+        facebookUser.currency = dbUser.facebook.currency;
+        facebookUser.adAccounts = dbUser.facebook.adAccounts;
+        callback(null, facebookUser);
+      } else {
+        FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
+          facebookUser.currency = currency;
+          FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
+            if (!adaccounts || adaccounts.error) return callback(adaccounts.error, null);
+            facebookUser.adAccounts = adaccounts.data;
+            User.update({
+                'facebook.id': facebookUser.id
+              }, {
+                'facebook.currency': facebookUser.currency.currency
+              },
+              function (err) {
+                if (err) return callback(err, null);
+                User.update({
+                    'facebook.id': facebookUser.id
+                  }, {
+                    'facebook.adAccounts': facebookUser.adAccounts
+                  },
+                  function (err) {
+                    if (err) return callback(err, null);
+                    callback(null, facebookUser);
+                  }
+                );
+              }
+            );
+          });
         });
-      });
+      }
     }
   });
 }

@@ -127,6 +127,7 @@ export class DashboardComponent implements OnInit {
 
   onPickedDateRangeType(event: string) {
     this.ref.detectChanges();
+    console.log(event);
     this.syncDateRangeType = event;
   }
 

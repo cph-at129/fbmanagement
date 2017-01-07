@@ -208,7 +208,5 @@ module.exports = function (app, passport, config) {
 function errorHandler(err, req, res, next) {
   console.log('======           ERR       ======');
   console.log(err);
-  res.status(500).send({
-    error: err.err
-  })
+  res.status(500).send(err)
 }
