@@ -20,7 +20,6 @@ filtering of different statistical data, graphical visualization of the data and
 
 ```bash
 # clone the repository
-git clone https://bitbucket.org/mindjumpers/fbmanagement-angular
 
 # go inside the project directory
 cd fbmanagement-angular
