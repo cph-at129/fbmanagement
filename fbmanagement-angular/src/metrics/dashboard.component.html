@@ -5,11 +5,11 @@
     <h2>Dashboard</h2>
   </alert>
   <div class="card col-xs-12">
-    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+    <!--<div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
       <div class="card-title text-xs-center">
         <p>Ad Accounts</p>
       </div>
-    </div>
+    </div>-->
     <div class="card col-xs-4">
       <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
         <div class="card-title text-xs-center">
@@ -85,11 +85,11 @@
     </div>
   </div>
   <div class="card col-xs-12" *ngIf="showOldData">
-    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+    <!--<div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
       <div class="card-title">
         <p>Old Data</p>
       </div>
-    </div>
+    </div>-->
     <div class="card-block text-xs-center">
       <button type="button" class="btn btn-primary" (click)="setItemsType('ads')">Ads</button>
       <button type="button" class="btn btn-primary" (click)="setItemsType('adsets')">Adsets</button>
@@ -99,18 +99,18 @@
       <metrics-ads [ads]="ads" (onFilter)="onFiltered($event)"></metrics-ads>
     </div>
     <!--<div *ngIf="itemsType === 'adsets'">
-      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered()></metrics-adsets>
-    </div>
-    <div *ngIf="itemsType === 'campaigns'">
-      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered()></metrics-campaigns>
+      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered()"></metrics-adsets>
     </div>-->
+    <div *ngIf="itemsType === 'campaigns' && campaigns.length > 0">
+      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered()"></metrics-campaigns>
+    </div>
   </div>
   <div class="card col-xs-12" *ngIf="itemsType !== '' && !showOldData">
-    <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+    <!--<div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
       <div class="card-title">
         <p>New Data</p>
       </div>
-    </div>
+    </div>-->
     <div class="card-block" *ngIf="itemsType === 'ads' && ads.length > 0">
       <metrics-ads [ads]="ads" (onFilter)="onFiltered($event)"></metrics-ads>
     </div>

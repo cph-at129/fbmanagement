@@ -58,6 +58,10 @@ export class HomeComponent implements OnInit {
     this.getUser();
   }
 
+  onFiltered(event: Boolean) {
+    this.ref.detectChanges();
+  }
+
   getUser() {
     this.fbmanagerService.getUser()
       .then((userInfo) => {

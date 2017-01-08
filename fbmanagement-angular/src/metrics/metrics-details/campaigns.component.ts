@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { FbmanagerService } from '../../fbmanager.service';
 import { MetricsService } from '../metrics.service';
 
@@ -9,79 +9,77 @@ var insights_tooltips = require('./insights-tooltips.json');
   templateUrl: 'campaigns.component.html'
 })
 export class CampaignsComponent implements OnInit {
-  campaign_insights_tooltips = insights_tooltips.campaign;
-  error: string;
-  info: string;
-  synchronizing = false;
-  userInfo: any;
-  campaigns = [];
-  lastSynced: number;
-  preferred_currency = '';
+  // campaign_insights_tooltips = insights_tooltips.campaign;
+  // error: string;
+  // info: string;
+  // synchronizing = false;
+  // userInfo: any;
+  // lastSynced: number;
+  // preferred_currency = '';
 
-  constructor(
-    private fbmanagerService: FbmanagerService,
-    private metricsService: MetricsService) {
+  @Input('campaigns') campaignsInput;
+  @Output() onFilter = new EventEmitter<boolean>();
+  campaigns = [];
+
+  constructor(private ref: ChangeDetectorRef) {
   }
 
   ngOnInit() {
-    this.fbmanagerService.loginCheck();
-    this.clearAdAccount();
-    this.getUser();
+    this.campaigns = this.campaignsInput;
+    console.log('on init');
+    console.log(this.campaigns);
   }
 
-  getUser() {
-    this.fbmanagerService.getUser()
-      .then((userInfo) => {
-        if (!userInfo || Object.keys(userInfo).length === 0) {
-          this.fbmanagerService.logout();
-        } else {
-          this.userInfo = userInfo;
-          userInfo.adAccounts.forEach((adAccount) => {
-            this.getAdAccount(adAccount.id);
-          });
-        }
-      })
-  }
-
-  getAdAccount(account_id) {
-    this.metricsService.getAdAccount(account_id)
-      .then((adAccount) => {
-        if (adAccount) {
-          this.initAdAccount(adAccount);
-        }
-      })
-  }
-
-  // syncAdAccount(id: string) {
-  //   this.clearAdAccount();
-  //   this.metricsService.syncAdAccount(id)
-  //     .then((result) => {
-  //       this.info = 'Successfully synchronized!';
-  //       this.getAdAccount(this.account_id);
-  //     }, (error) => {
-  //       this.error = error;
-  //     })
-  // }
-
-  findLastSynced(scan_id: string) {
-    return parseInt(scan_id.split('_')[0]) * 1000;
-  }
-
-  setCurrency(preferred_currency) {
-    this.preferred_currency = preferred_currency;
-  }
-
-  initAdAccount(adAccount) {
-    if (adAccount.campaigns.length > 0) {
-      adAccount.campaigns.forEach((campaign) => {
-        this.campaigns.push(campaign);
-      });
-      this.lastSynced = this.findLastSynced(this.campaigns[0].scan_id);
-      this.setCurrency(this.campaigns[0].currency.user_currency);
-    }
-  }
-
-  clearAdAccount() {
+  filterByCriteria(criteria: string) {
+    var sortedData = [];
     this.campaigns = [];
+    this.ref.detectChanges();
+    sortedData = this.campaignsInput;
+    switch (criteria) {
+      case 'newest':
+        this.campaigns = sortedData.sort((a, b) => {
+          return new Date(b.created_time).getTime() - new Date(a.created_time).getTime();
+        });
+        break;
+      case 'oldest':
+        this.campaigns = sortedData.sort((a, b) => {
+          return new Date(a.created_time).getTime() - new Date(b.created_time).getTime();
+        });
+        break;
+      case 'reset':
+        this.campaigns = this.campaignsInput;
+        break;
+      default:
+        this.campaigns = sortedData.sort((a, b) => {
+          return b[criteria] - a[criteria];
+        });
+    }
+    this.onFilter.emit(true);
+    this.ref.detectChanges();
+  }
+
+  filterByObjective(objective: string) {
+    var filteredCampaigns = [];
+    var emptyArray = this.campaignsInput.length === 0;
+    if (objective === 'all') {
+      filteredCampaigns = this.campaignsInput;
+    } else {
+      if (!emptyArray) {
+        this.campaignsInput.forEach((ad) => {
+          var adObjective = ad.objective;
+          if (adObjective) {
+            if (adObjective.toLowerCase() === objective) {
+              filteredCampaigns.push(ad);
+            }
+          }
+        });
+      } else {
+        filteredCampaigns = this.campaignsInput;
+      }
+    }
+
+    this.campaigns = filteredCampaigns;
+    this.onFilter.emit(true);
+    this.ref.detectChanges();
   }
 }

@@ -15,14 +15,14 @@ export class SearchPipe implements PipeTransform {
       case 'adset':
         return metrics.filter((adset) => {
           if (typeof searchText !== 'undefined') {
-            return adset.toLowerCase().name.indexOf(searchText) !== -1;
+            return adset.name.toLowerCase().indexOf(searchText) !== -1;
           }
           return true;
         });
       case 'campaign':
         return metrics.filter((campaign) => {
           if (typeof searchText !== 'undefined') {
-            return campaign.toLowerCase().name.indexOf(searchText) !== -1;
+            return campaign.name.toLowerCase().indexOf(searchText) !== -1;
           }
           return true;
         });

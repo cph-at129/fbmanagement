@@ -25,7 +25,12 @@
           <img class="card-img-top" src="{{ad.ad_creatives.thumbnail_url}}" alt="post image">
         </div>
         <div class="col-xs-10">
-          <div class="card-title" [ngStyle]="{'cursor': 'pointer'}">{{ad.name}}</div>
+          <div class="col-xs-6">
+            <p>{{ad.name}}</p>
+          </div>
+          <div class="col-xs-4">
+            <span class="tag tag-info">Synchronized on: {{ad.scan_id.split('_')[0] * 1000 | date:'short'}}</span>
+          </div>
         </div>
       </div>
       <div class="table-responsive">
