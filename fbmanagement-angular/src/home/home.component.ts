@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
   campaigns = [];
   ads = [];
   bestPerformanceAd: any;
+  DEFAULT_DATE_RANGE = 'lifetime';
 
   constructor(private router: Router,
     private JwtService: JwtService,
@@ -54,7 +55,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.fbmanagerService.loginCheck();
-    // this.clearAdAccount();
     this.getUser();
   }
 
@@ -78,10 +78,14 @@ export class HomeComponent implements OnInit {
 
   getAdAccount(account_id) {
     this.metricsService.getAdAccount(account_id)
-      .then((adAccount) => {
-        if (adAccount) {
-          this.initAdAccount(adAccount);
-          this.filterBestPerformanceAd();
+      .then((data) => {
+        if (data) {
+          if (data.campaigns.length === 0) {
+            this.syncAdAccountForDateRange(account_id, this.DEFAULT_DATE_RANGE);
+          } else {
+            this.initData(data);
+            this.filterBestPerformanceAd();
+          }
         }
       })
   }
@@ -96,26 +100,24 @@ export class HomeComponent implements OnInit {
       })
   }
 
-  syncAdAccount(id: string) {
+  syncAdAccountForDateRange(id: string, date_range: string) {
     this.synchronizing = true;
-    this.metricsService.syncAdAccount(id)
-      .then((result) => {
+    this.metricsService.syncAdAccountForDateRangeType(id, date_range)
+      .then((data) => {
         this.synchronizing = false;
-        this.getAdAccount(id);
+        this.initData(data);
+        this.filterBestPerformanceAd();
+        this.ref.detectChanges();
       })
   }
 
-  initAdAccount(adAccount) {
-    if (adAccount.campaigns) {
-      adAccount.campaigns.forEach((campaign) => {
-        this.campaigns.push(campaign);
-      });
-    }
-    if (adAccount.ads) {
-      adAccount.ads.forEach((ad) => {
-        this.ads.push(ad);
-      });
-    }
+  initData(data) {
+    data.campaigns.forEach(campaign => {
+      this.campaigns.push(campaign);
+    });
+    data.ads.forEach(ad => {
+      this.ads.push(ad);
+    });
     this.ref.detectChanges();
   }
 
@@ -133,5 +135,8 @@ export class HomeComponent implements OnInit {
         this.bestPerformanceAd = ad;
       }
     });
+    console.log('filtering best perfo ad');
+    console.log(this.bestPerformanceAd);
+    this.ref.detectChanges();
   }
 }

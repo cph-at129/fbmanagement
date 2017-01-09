@@ -22,7 +22,7 @@ export class DateRangePicker {
   @Output() onPickDateRangeType = new EventEmitter<string>();
 
   public dateRangeTypesArray: Array<string> = [
-    'today', 'last_3_days', 'last_7_days', 'last_14_days', 'last_30_days', 'last_90_days', 'this_year'
+    'today', 'last_3_days', 'last_7_days', 'last_14_days', 'last_30_days', 'last_90_days', 'this_quarter','lifetime'
   ];
   public dt: Date = new Date();
   public minDate: Date = void 0;

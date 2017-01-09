@@ -707,7 +707,6 @@ function _getInsights(facebookUser, dateRange, id, nodeType, callback) {
     parametersDetailsInsights.fields = config.insightMetrics.insightsAdFields;
     parametersAdCreatives.fields = config.insightMetrics.adFieldsAdCreatives;
   }
-
   FB.api('/' + id, parametersGeneralInsights, function (generalInsights) {
     if (!generalInsights || generalInsights.error) return callback(generalInsights.error, null);
     insights.generalInsights = generalInsights;
