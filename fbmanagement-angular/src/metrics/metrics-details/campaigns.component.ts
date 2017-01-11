@@ -10,24 +10,18 @@ var insights_tooltips = require('./insights-tooltips.json');
 })
 export class CampaignsComponent implements OnInit {
   // campaign_insights_tooltips = insights_tooltips.campaign;
-  // error: string;
-  // info: string;
-  // synchronizing = false;
-  // userInfo: any;
-  // lastSynced: number;
-  // preferred_currency = '';
+
 
   @Input('campaigns') campaignsInput;
   @Output() onFilter = new EventEmitter<boolean>();
   campaigns = [];
+  preferred_currency = '';
 
   constructor(private ref: ChangeDetectorRef) {
   }
 
   ngOnInit() {
     this.campaigns = this.campaignsInput;
-    console.log('on init');
-    console.log(this.campaigns);
   }
 
   filterByCriteria(criteria: string) {
@@ -81,5 +75,9 @@ export class CampaignsComponent implements OnInit {
     this.campaigns = filteredCampaigns;
     this.onFilter.emit(true);
     this.ref.detectChanges();
+  }
+
+  setCurrency(preferred_currency) {
+    this.preferred_currency = preferred_currency;
   }
 }

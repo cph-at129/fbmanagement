@@ -16,7 +16,8 @@ var userSchema = mongoose.Schema({
     name: String,
     email: String,
     currency: {},
-    adAccounts: []
+    adAccounts: [],
+    pages: []
   }
 });
 

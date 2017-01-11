@@ -1,6 +1,8 @@
 <div class="card">
-  <div class="card-block card-primary">
-    <div class="card-title">Campaigns</div>
+  <div class="card-block btn-primary">
+    <div class="card-title text-xs-center">
+      <h3>Campaigns</h3>
+    </div>
   </div>
   <div class="row" [ngStyle]="{'margin':'10px'}">
     <div class="col-xs-4">
@@ -39,8 +41,13 @@
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Updated</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Start Date</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> End Date</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Objective</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend</th>
+              <th><i class="fa fa-bullseye" aria-hidden="true"></i> Objective</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend
+              <span class="tag tag-default" (mouseover)="setCurrency(campaign.currency)" [ngStyle]="{'cursor': 'pointer'}">{{campaign.currency}}</span>
+                <span *ngIf="campaign.currency !== 'USD'" class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
+                <span *ngIf="campaign.currency !== 'EUR'" class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
+                <span *ngIf="campaign.currency !== 'GBP'" class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -49,12 +56,15 @@
                 <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'green'}" *ngIf="campaign.configured_status === 'ACTIVE'"></i>
                 <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'red'}" *ngIf="campaign.configured_status === 'PAUSED'"></i>
               </td>
-              <td><span class="tag tag-info">{{campaign.created_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{campaign.updated_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{campaign.date_start| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{campaign.date_stop| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{campaign.created_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{campaign.updated_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{campaign.date_start| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{campaign.date_stop| date:'shortDate'}}</span></td>
               <td><span class="tag tag-info">{{campaign.objective}}</span></td>
-              <td><span class="tag tag-info">{{campaign.spend}}</span></td>
+              <td>
+                <span *ngIf="preferred_currency === campaign.currency || preferred_currency === ''" [style.color]="'green'">{{campaign.spend}} {{campaign.currency}}</span>
+                <span *ngIf="preferred_currency !== ''" [style.color]="'green'">{{campaign.spend | currencyConverter:campaign.currency:preferred_currency | async}}</span>
+              </td>
             </tr>
           </tbody>
           <thead class="thead-default">

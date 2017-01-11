@@ -98,11 +98,11 @@
     <div class="card-block" *ngIf="itemsType === 'ads' && ads.length > 0">
       <metrics-ads [ads]="ads" (onFilter)="onFiltered($event)"></metrics-ads>
     </div>
-    <!--<div *ngIf="itemsType === 'adsets'">
-      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered()"></metrics-adsets>
-    </div>-->
+    <div *ngIf="itemsType === 'adsets' && adsets.length > 0">
+      <metrics-adsets [adsets]="adsets" (onFilter)="onFiltered($event)"></metrics-adsets>
+    </div>
     <div *ngIf="itemsType === 'campaigns' && campaigns.length > 0">
-      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered()"></metrics-campaigns>
+      <metrics-campaigns [campaigns]="campaigns" (onFilter)="onFiltered($event)"></metrics-campaigns>
     </div>
   </div>
   <div class="card col-xs-12" *ngIf="itemsType !== '' && !showOldData">

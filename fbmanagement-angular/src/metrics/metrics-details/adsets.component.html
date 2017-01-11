@@ -1,40 +1,78 @@
-<navigation></navigation>
-<div class="container">
-  <div class="jumbotron">
-    <h4>Your Adsets</h4>
+<div class="card">
+  <div class="card-block btn-primary">
+    <div class="card-title text-xs-center">
+      <h3>Adsets</h3>
+    </div>
   </div>
-  <alert type="info" dismissible="true">
-    <div class="col-md-10">
-      <p><i class="fa fa-refresh" aria-hidden="true"></i> <em>Last Synchronization {{lastSynced | date:'medium'}}</em></p>
+  <div class="row" [ngStyle]="{'margin':'10px'}">
+    <div class="col-xs-4">
+      <div class="input-group">
+        <input type="text" [(ngModel)]="searchText" class="form-control" placeholder="Search for adsets..">
+      </div>
     </div>
-    <button class="btn btn-warning" (click)="syncAdAccount(account_id)">Sync Now</button>
-  </alert>
-  <div class="card" *ngFor="let campaign of adsets">
-    <div class="card-block">
-      <div class="card-title">{{campaign.campaign_name}}</div>
+    <div class="col-xs-8">
+      <div class="col-xs-3">
+        <metrics-objective-filter (sortBy)="(filterByObjective( $event ))"></metrics-objective-filter>
+      </div>
+      <div class="col-xs-2"></div>
+      <div class="col-xs-3">
+        <metrics-criteria-filter (sortBy)="(filterByCriteria( $event ))"></metrics-criteria-filter>
+      </div>
     </div>
-    <div class="card-block">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          <i class="fa fa-user" aria-hidden="true"></i> {{campaign.account_name}}
-        </li>
-        <li class="list-group-item" [style.background]="'green'">
-          <i class="fa fa-eye" aria-hidden="true"></i> Impressions {{campaign.unique_impressions}}
-        </li>
-        <li class="list-group-item">
-          <i class="fa fa-flag" aria-hidden="true"></i> Reach {{campaign.reach}}
-        </li>
-        <li class="list-group-item">
-          <i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks {{campaign.clicks}}
-        </li>
-        <li class="list-group-item">
-          <i class="fa fa-bullseye" aria-hidden="true"></i> {{campaign.objective}}
-        </li>
-      </ul>
+  </div>
+  <div class="card card-block">
+    <div class="card" *ngFor="let adset of adsets | search:'adset':searchText">
       <div class="card-block">
-        <a routerLink="/campaign/{{campaign.campaign_id}}" class="btn btn-success">
-              campaign details
-            </a>
+        <div class="card-title" [ngStyle]="{'cursor': 'pointer'}">
+          <div class="col-xs-6">
+            <p>{{adset.name}}</p>
+          </div>
+          <div class="col-xs-3">
+            <span class="tag tag-info">Synchronized on: {{adset.scan_id.split('_')[0] * 1000 | date:'short'}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead class="thead-default">
+            <tr class="text-xs-center">
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Created</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Updated</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Start Date</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> End Date</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Objective</th>
+              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-info">{{adset.created_time| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{adset.updated_time| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{adset.date_start| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{adset.date_stop| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{adset.objective}}</span></td>
+              <td><span class="tag tag-info">{{adset.spend}}</span></td>
+            </tr>
+          </tbody>
+          <thead class="thead-default">
+            <th><i class="fa fa-users" aria-hidden="true"></i> Reach</th>
+            <th><i class="fa fa-eye" aria-hidden="true"></i> Impressions</th>
+            <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks</th>
+            <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> cpc</th>
+            <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> cpm</th>
+            <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> cpp</th>
+            <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> ctr</th>
+          </thead>
+          <tbody>
+            <td><span class="tag tag-info">{{adset.reach}}</span></td>
+            <td><span class="tag tag-info">{{adset.unique_impressions}}</span></td>
+            <td><span class="tag tag-info">{{adset.clicks}}</span></td>
+            <td><span class="tag tag-info">{{adset.cpc}}</span></td>
+            <td><span class="tag tag-info">{{adset.cpm}}</span></td>
+            <td><span class="tag tag-info">{{adset.cpp}}</span></td>
+            <td><span class="tag tag-info">{{adset.ctr}}</span></td>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

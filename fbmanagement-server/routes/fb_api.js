@@ -37,6 +37,7 @@ exports.getUserInfo = function (user, callback) {
       });
     }, function (err) {
       if (err) return callback(err, null);
+      console.log(facebookUser.adAccountsInfo);
       callback(null, facebookUser);
     });
   });
@@ -617,10 +618,10 @@ function _getAdAccountDetails(id, callback) {
  *
  * returns only array of the items that contain data
  */
-function _checkIfItemEmpty(data){
+function _checkIfItemEmpty(data) {
   var checkedItemsArr = [];
-  data.forEach(function(item){
-    if(item.date_start){
+  data.forEach(function (item) {
+    if (item.date_start) {
       checkedItemsArr.push(item);
     }
   });
@@ -745,36 +746,50 @@ function _initFacebookUser(user, callback) {
     'facebook.id': facebookUser.id
   }, (err, dbUser) => {
     if (err) return callback(err, null);
-    if (dbUser.facebook.adAccounts) {
-      if (dbUser.facebook.adAccounts.length > 0) {
+    if (dbUser.facebook.adAccounts && dbUser.facebook.pages) {
+      if (dbUser.facebook.adAccounts.length > 0 && dbUser.facebook.pages.length > 0) {
         facebookUser.currency = dbUser.facebook.currency;
         facebookUser.adAccounts = dbUser.facebook.adAccounts;
+        facebookUser.pages = dbUser.facebook.pages;
         callback(null, facebookUser);
       } else {
-        FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
-          facebookUser.currency = currency;
-          FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
-            if (!adaccounts || adaccounts.error) return callback(adaccounts.error, null);
-            facebookUser.adAccounts = adaccounts.data;
-            User.update({
-                'facebook.id': facebookUser.id
-              }, {
-                'facebook.currency': facebookUser.currency.currency
-              },
-              function (err) {
-                if (err) return callback(err, null);
-                User.update({
-                    'facebook.id': facebookUser.id
-                  }, {
-                    'facebook.adAccounts': facebookUser.adAccounts
-                  },
-                  function (err) {
-                    if (err) return callback(err, null);
-                    callback(null, facebookUser);
-                  }
-                );
-              }
-            );
+        FB.api('/' + facebookUser.id + '/accounts', parameters, function (accounts) {
+          if (!accounts || accounts.error) return callback(accounts.error, null);
+          facebookUser.pages = accounts.data;
+          FB.api('/' + facebookUser.id + '/?fields=currency', parameters, function (currency) {
+            facebookUser.currency = currency;
+            FB.api('/' + facebookUser.id + '/adaccounts?fields=user_currency', parameters, function (adaccounts) {
+              if (!adaccounts || adaccounts.error) return callback(adaccounts.error, null);
+              facebookUser.adAccounts = adaccounts.data;
+              User.update({
+                  'facebook.id': facebookUser.id
+                }, {
+                  'facebook.currency': facebookUser.currency.currency
+                },
+                function (err) {
+                  if (err) return callback(err, null);
+                  User.update({
+                      'facebook.id': facebookUser.id
+                    }, {
+                      'facebook.adAccounts': facebookUser.adAccounts
+                    },
+                    function (err) {
+                      if (err) return callback(err, null);
+                      User.update({
+                          'facebook.id': facebookUser.id
+                        }, {
+                          'facebook.pages': facebookUser.pages
+                        },
+                        function (err) {
+                          if (err) return callback(err, null);
+                          callback(null, facebookUser);
+                        }
+                      );
+                    }
+                  );
+                }
+              );
+            });
           });
         });
       }

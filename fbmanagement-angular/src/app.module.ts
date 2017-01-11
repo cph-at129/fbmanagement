@@ -24,7 +24,7 @@ import { LoginComponent } from './login';
 import { DoLoginComponent } from './doLogin';
 import { HomeComponent } from './home';
 import {
-  MetricsService, AdsComponent, CampaignsComponent,
+  MetricsService, AdsComponent, CampaignsComponent, AdsetsComponent,
   AdAccountDetailsComponent, PageDetailsComponent, MetricsBarChartComponent,
   MetricsPieChartComponent, MetricsLineChartComponent, PostDetailsComponent,
   DashboardComponent
@@ -45,6 +45,7 @@ import { routes } from './app.routes';
     DashboardComponent,
     AdAccountDetailsComponent,
     AdsComponent,
+    AdsetsComponent,
     CampaignsComponent,
     PageDetailsComponent,
     PostDetailsComponent,

@@ -22,6 +22,7 @@ export class HomeComponent implements OnInit {
   synchronizing = false;
   synchronizingPages = false;
   // ---------------------
+  preferred_currency = '';
   userInfo: any;
   campaigns = [];
   ads = [];
@@ -34,24 +35,6 @@ export class HomeComponent implements OnInit {
     private metricsService: MetricsService,
     private ref: ChangeDetectorRef) {
   }
-
-  // syncAll() {
-  //   state_syncedAll = true;
-  //   this.fbmanagerService.getUser()
-  //     .then((userInfo) => {
-  //       if (!userInfo || Object.keys(userInfo).length === 0) {
-  //         this.fbmanagerService.logout();
-  //       } else {
-  //         this.userInfo = userInfo;
-  //         userInfo.adAccounts.forEach((adAccount) => {
-  //           this.syncAdAccount(adAccount.id);
-  //         });
-  //         userInfo.pages.forEach((page)=>{
-  //           this.syncPage(page.id);
-  //         });
-  //       }
-  //     })
-  // }
 
   ngOnInit() {
     this.fbmanagerService.loginCheck();
@@ -69,11 +52,16 @@ export class HomeComponent implements OnInit {
           this.fbmanagerService.logout();
         } else {
           this.userInfo = userInfo;
+          console.log(userInfo.adAccountsInfo);
           userInfo.adAccounts.forEach((adAccount) => {
             this.getAdAccount(adAccount.id);
           });
         }
       })
+  }
+
+  setCurrency(preferred_currency) {
+    this.preferred_currency = preferred_currency;
   }
 
   getAdAccount(account_id) {
@@ -90,16 +78,6 @@ export class HomeComponent implements OnInit {
       })
   }
 
-  syncPage(page_id) {
-    this.synchronizing = true;
-    this.synchronizingPages = true;
-    this.metricsService.syncPage(page_id)
-      .then((pageMetrics) => {
-        this.synchronizing = false;
-        this.synchronizingPages = false;
-      })
-  }
-
   syncAdAccountForDateRange(id: string, date_range: string) {
     this.synchronizing = true;
     this.metricsService.syncAdAccountForDateRangeType(id, date_range)
@@ -113,12 +91,24 @@ export class HomeComponent implements OnInit {
 
   initData(data) {
     data.campaigns.forEach(campaign => {
-      this.campaigns.push(campaign);
+      var assignedItem = this.assignCurrency(campaign);
+      this.campaigns.push(assignedItem);
     });
     data.ads.forEach(ad => {
-      this.ads.push(ad);
+      var assignedItem = this.assignCurrency(ad);
+      this.ads.push(assignedItem);
     });
     this.ref.detectChanges();
+  }
+
+  assignCurrency(item) {
+    var assignedItem = item;
+    this.userInfo.adAccountsInfo.forEach(account => {
+      if (account.account_id === item.account_id) {
+        assignedItem.currency = account.currency;
+      }
+    });
+    return assignedItem;
   }
 
   clearAdAccount() {
@@ -132,11 +122,11 @@ export class HomeComponent implements OnInit {
     }
     this.ads.forEach((ad) => {
       if (parseInt(ad.unique_impressions) > parseInt(this.bestPerformanceAd.unique_impressions)) {
-        this.bestPerformanceAd = ad;
+        var assignedItem = this.assignCurrency(ad);
+        this.bestPerformanceAd = assignedItem;
+        this.preferred_currency = assignedItem.currency;
       }
     });
-    console.log('filtering best perfo ad');
-    console.log(this.bestPerformanceAd);
     this.ref.detectChanges();
   }
 }
