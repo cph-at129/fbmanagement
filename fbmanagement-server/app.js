@@ -1,5 +1,5 @@
 var logger = require('morgan');
-var cors = require('cors');
+var cors = require('express-cors');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
@@ -40,7 +40,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use(cors());
+app.use(cors({
+  allowedOrigins: ['*.fbmanagement.site', 'http://fbmanagement.mjdev.eu:3000'],
+  headers: ['X-Requested-With', 'Content-Type', 'Authorization']
+}));
   //*********** LOGGER **************************
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

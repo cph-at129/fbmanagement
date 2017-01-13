@@ -41,21 +41,28 @@
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Start Date</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> End Date</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Objective</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend</th>
+              <th><i class="fa fa-money" aria-hidden="true"></i> Spend
+              <span class="tag tag-default" (mouseover)="setCurrency(adset.currency)" [ngStyle]="{'cursor': 'pointer'}">{{adset.currency}}</span>
+                <span *ngIf="adset.currency !== 'USD'" class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
+                <span *ngIf="adset.currency !== 'EUR'" class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
+                <span *ngIf="adset.currency !== 'GBP'" class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="tag tag-info">{{adset.created_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{adset.updated_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{adset.date_start| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{adset.date_stop| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{adset.created_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{adset.updated_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{adset.date_start| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{adset.date_stop| date:'shortDate'}}</span></td>
               <td><span class="tag tag-info">{{adset.objective}}</span></td>
-              <td><span class="tag tag-info">{{adset.spend}}</span></td>
+              <td>
+                <span *ngIf="preferred_currency === adset.currency || preferred_currency === ''" [style.color]="'green'">{{adset.spend}} {{adset.currency}}</span>
+                <span *ngIf="preferred_currency !== '' && preferred_currency !== adset.currency" [style.color]="'green'">{{adset.spend | currencyConverter:adset.currency:preferred_currency | async}}</span>
+              </td>
             </tr>
           </tbody>
           <thead class="thead-default">
-            <th><i class="fa fa-users" aria-hidden="true"></i> Reach</th>
             <th><i class="fa fa-eye" aria-hidden="true"></i> Impressions</th>
             <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Clicks</th>
             <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> cpc</th>
@@ -64,7 +71,6 @@
             <th><i class="fa fa-mouse-pointer" aria-hidden="true"></i> ctr</th>
           </thead>
           <tbody>
-            <td><span class="tag tag-info">{{adset.reach}}</span></td>
             <td><span class="tag tag-info">{{adset.unique_impressions}}</span></td>
             <td><span class="tag tag-info">{{adset.clicks}}</span></td>
             <td><span class="tag tag-info">{{adset.cpc}}</span></td>

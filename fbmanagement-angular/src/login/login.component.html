@@ -1,5 +1,18 @@
-<div [style.margin-top]="'5em'">
-  <a class="btn btn-primary btn-lg btn-block" href="{{LOGIN_URL}}">
-    <i class="fa fa-facebook" aria-hidden="true"></i> Sign in with Facebook
-  </a>
+<div class="container" [style.margin-top]="'5em'">
+  <div class="jumbotron jumbotron-fluid text-xs-center">
+    <h1 class="display-3">Facebook Management Application</h1>
+    <p class="lead">Try our new application to manage you facebook business accounts!</p>
+    <hr class="my-4">
+    <p>Simply sign in with your facebook account and start using the application!</p>
+    <p>
+      <i class="fa fa-smile-o fa-5x" [ngStyle]="{'color': '#0275d8'}" aria-hidden="true"></i>
+      <i class="fa fa-cog fa-spin fa-3x fa-fw" [ngStyle]="{'color': '#0275d8'}"></i>
+      <i class="fa fa-smile-o fa-5x" aria-hidden="true" [ngStyle]="{'color': '#0275d8'}"></i>
+    </p>
+    <div>
+      <a class="btn btn-primary btn-lg" href="{{LOGIN_URL}}">
+        <i class="fa fa-facebook" aria-hidden="true"></i> Sign in with Facebook
+      </a>
+    </div>
+  </div>
 </div>

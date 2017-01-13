@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-block btn-primary">
     <div class="card-title text-xs-center">
-      <h3>Campaigns</h3>
+      <h3>You have {{campaigns.length}} Campaigns</h3>
     </div>
   </div>
   <div class="row" [ngStyle]="{'margin':'10px'}">
@@ -33,17 +33,18 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-sm table-bordered">
+        <table class="table table-bordered">
           <thead class="thead-default">
-            <tr class="text-xs-center">
+            <tr>
               <th><i class="fa fa-spinner" aria-hidden="true"></i> Status</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Created</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Updated</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Start Date</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> End Date</th>
               <th><i class="fa fa-bullseye" aria-hidden="true"></i> Objective</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend
-              <span class="tag tag-default" (mouseover)="setCurrency(campaign.currency)" [ngStyle]="{'cursor': 'pointer'}">{{campaign.currency}}</span>
+              <th><i class="fa fa-money" aria-hidden="true"></i>
+                <span class="text-xs-center">Spend</span>
+                <span class="tag tag-default" (mouseover)="setCurrency(campaign.currency)" [ngStyle]="{'cursor': 'pointer'}">{{campaign.currency}}</span>
                 <span *ngIf="campaign.currency !== 'USD'" class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
                 <span *ngIf="campaign.currency !== 'EUR'" class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
                 <span *ngIf="campaign.currency !== 'GBP'" class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
@@ -63,7 +64,7 @@
               <td><span class="tag tag-info">{{campaign.objective}}</span></td>
               <td>
                 <span *ngIf="preferred_currency === campaign.currency || preferred_currency === ''" [style.color]="'green'">{{campaign.spend}} {{campaign.currency}}</span>
-                <span *ngIf="preferred_currency !== ''" [style.color]="'green'">{{campaign.spend | currencyConverter:campaign.currency:preferred_currency | async}}</span>
+                <span *ngIf="preferred_currency !== '' && preferred_currency !== campaign.currency" [style.color]="'green'">{{campaign.spend | currencyConverter:campaign.currency:preferred_currency | async}}</span>
               </td>
             </tr>
           </tbody>

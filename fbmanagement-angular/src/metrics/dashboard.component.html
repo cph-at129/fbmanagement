@@ -1,31 +1,26 @@
 <navigation></navigation>
 <div class="container">
   <alert *ngIf="error" type="danger" dismissible="true">{{ error }}</alert>
-  <alert class="text-xs-center" type="info">
+  <!--<alert class="text-xs-center" type="info">
     <h2>Dashboard</h2>
-  </alert>
+  </alert>-->
   <div class="card col-xs-12">
-    <!--<div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
-      <div class="card-title text-xs-center">
-        <p>Ad Accounts</p>
-      </div>
-    </div>-->
     <div class="card col-xs-4">
-      <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+      <div class="card-block btn-primary" [ngStyle]="{'margin-bottom':'10px'}">
         <div class="card-title text-xs-center">
-          <p>Please select an account</p>
+          <h3>Please select an account</h3>
         </div>
       </div>
       <div class="card-block" *ngIf="adAccounts.length > 0">
         <ul class="list-group">
-          <li class="list-group-item list-group-item-action" *ngFor="let account of adAccounts" (click)="selectAccount(account)">{{account.name}}</li>
+          <li class="list-group-item list-group-item-action text-xs-center" *ngFor="let account of adAccounts" (click)="selectAccount(account)">{{account.name}}</li>
         </ul>
       </div>
     </div>
     <div class="card col-xs-8" *ngIf="selectedAccount">
-      <div class="card-block card-primary" [ngStyle]="{'margin-bottom':'10px'}">
+      <div class="card-block btn-primary" [ngStyle]="{'margin-bottom':'10px'}">
         <div class="card-title text-xs-center">
-          <p>{{selectedAccount.name}}</p>
+          <h3>{{selectedAccount.name}}</h3>
         </div>
       </div>
       <div class="card-block col-xs-4">

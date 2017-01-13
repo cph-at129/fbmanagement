@@ -27,6 +27,6 @@ export class DoLoginComponent implements OnInit {
 
   login(token) {
     localStorage.setItem('id_token', token);
-    this.router.navigate(['dashboard']);
+    this.router.navigate(['home']);
   }
 }

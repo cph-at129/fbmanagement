@@ -49,6 +49,9 @@ export class DashboardComponent implements OnInit {
           this.userInfo = userInfo;
           this.adAccounts = userInfo.adAccountsInfo;
         }
+      }).catch((err) => {
+        console.error(err);
+        this.fbmanagerService.logout();
       })
   }
 
@@ -110,6 +113,16 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  assignCurrency(item) {
+    var assignedItem = item;
+    this.userInfo.adAccountsInfo.forEach(account => {
+      if (account.account_id === item.account_id) {
+        assignedItem.currency = account.currency;
+      }
+    });
+    return assignedItem;
+  }
+
   onFiltered(event: Boolean) {
     this.ref.detectChanges();
   }
@@ -145,9 +158,18 @@ export class DashboardComponent implements OnInit {
   }
 
   initData(data) {
-    this.campaigns = data.campaigns;
-    this.adsets = data.adsets;
-    this.ads = data.ads;
+    data.campaigns.forEach(campaign => {
+      var assignedItem = this.assignCurrency(campaign);
+      this.campaigns.push(assignedItem);
+    });
+    data.adsets.forEach(adset => {
+      var assignedItem = this.assignCurrency(adset);
+      this.adsets.push(assignedItem);
+    });
+    data.ads.forEach(ad => {
+      var assignedItem = this.assignCurrency(ad);
+      this.ads.push(assignedItem);
+    });
   }
 
   clearAdAccount() {

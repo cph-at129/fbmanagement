@@ -2,7 +2,12 @@ import { Component, ChangeDetectorRef, EventEmitter, OnInit, Input, Output } fro
 
 @Component({
   selector: 'metrics-ads',
-  templateUrl: 'ads.component.html'
+  templateUrl: 'ads.component.html',
+  styles: [
+    `table th {
+      text-align: center;
+    }`
+  ]
 })
 
 export class AdsComponent implements OnInit {
@@ -10,6 +15,7 @@ export class AdsComponent implements OnInit {
   @Input('ads') adsInput;
   @Output() onFilter = new EventEmitter<boolean>();
   ads = [];
+  preferred_currency = '';
 
   constructor(private ref: ChangeDetectorRef) {
   }
@@ -69,5 +75,9 @@ export class AdsComponent implements OnInit {
     this.ads = filteredAds;
     this.onFilter.emit(true);
     this.ref.detectChanges();
+  }
+
+  setCurrency(preferred_currency) {
+    this.preferred_currency = preferred_currency;
   }
 }

@@ -6,7 +6,12 @@ var insights_tooltips = require('./insights-tooltips.json');
 
 @Component({
   selector: 'metrics-campaigns',
-  templateUrl: 'campaigns.component.html'
+  templateUrl: 'campaigns.component.html',
+  styles: [
+    `table th {
+      text-align: center;
+    }`
+  ]
 })
 export class CampaignsComponent implements OnInit {
   // campaign_insights_tooltips = insights_tooltips.campaign;

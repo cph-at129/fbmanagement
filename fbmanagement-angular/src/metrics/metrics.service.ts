@@ -47,7 +47,6 @@ export class MetricsService {
   }
 
   _getAdAccountCached(id: string) {
-    console.log('Using cache!!!');
     var adAccountCache;
     adAccountsCache.forEach((adAccount) => {
       if (adAccount.id === id) {

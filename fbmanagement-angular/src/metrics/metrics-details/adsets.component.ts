@@ -6,20 +6,20 @@ var insights_tooltips = require('./insights-tooltips.json');
 
 @Component({
   selector: 'metrics-adsets',
-  templateUrl: 'adsets.component.html'
+  templateUrl: 'adsets.component.html',
+  styles: [
+    `table th {
+      text-align: center;
+    }`
+  ]
 })
 export class AdsetsComponent implements OnInit {
   // campaign_insights_tooltips = insights_tooltips.campaign;
-  // error: string;
-  // info: string;
-  // synchronizing = false;
-  // userInfo: any;
-  // lastSynced: number;
-  // preferred_currency = '';
 
   @Input('adsets') adsetsInput;
   @Output() onFilter = new EventEmitter<boolean>();
   adsets = [];
+  preferred_currency = '';
 
   constructor(private ref: ChangeDetectorRef) {
   }
@@ -79,5 +79,9 @@ export class AdsetsComponent implements OnInit {
     this.adsets = filteredAdsets;
     this.onFilter.emit(true);
     this.ref.detectChanges();
+  }
+
+  setCurrency(preferred_currency) {
+    this.preferred_currency = preferred_currency;
   }
 }

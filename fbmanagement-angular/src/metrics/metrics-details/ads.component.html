@@ -44,8 +44,13 @@
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Updated</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> Start Date</th>
               <th><i class="fa fa-clock-o" aria-hidden="true"></i> End Date</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Objective</th>
-              <th><i class="fa fa-clock-o" aria-hidden="true"></i> Spend</th>
+              <th><i class="fa fa-bullseye" aria-hidden="true"></i> Objective</th>
+              <th><i class="fa fa-money" aria-hidden="true"></i> Spend
+              <span class="tag tag-default" (mouseover)="setCurrency(ad.currency)" [ngStyle]="{'cursor': 'pointer'}">{{ad.currency}}</span>
+                <span *ngIf="ad.currency !== 'USD'" class="tag tag-primary" (mouseover)="setCurrency('USD')" [ngStyle]="{'cursor': 'pointer'}">USD</span>
+                <span *ngIf="ad.currency !== 'EUR'" class="tag tag-success" (mouseover)="setCurrency('EUR')" [ngStyle]="{'cursor': 'pointer'}">EUR</span>
+                <span *ngIf="ad.currency !== 'GBP'" class="tag tag-warning" (mouseover)="setCurrency('GBP')" [ngStyle]="{'cursor': 'pointer'}">GBP</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -54,12 +59,15 @@
                 <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'green'}" *ngIf="ad.status === 'ACTIVE'"></i>
                 <i class="fa fa-circle" aria-hidden="true" [ngStyle]="{'color':'red'}" *ngIf="ad.status === 'PAUSED'"></i>
               </td>
-              <td><span class="tag tag-info">{{ad.created_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{ad.updated_time| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{ad.date_start| date:'short'}}</span></td>
-              <td><span class="tag tag-info">{{ad.date_stop| date:'short'}}</span></td>
+              <td><span class="tag tag-info">{{ad.created_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{ad.updated_time| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{ad.date_start| date:'shortDate'}}</span></td>
+              <td><span class="tag tag-info">{{ad.date_stop| date:'shortDate'}}</span></td>
               <td><span class="tag tag-info">{{ad.objective}}</span></td>
-              <td><span class="tag tag-info">{{ad.spend}}</span></td>
+              <td>
+                <span *ngIf="preferred_currency === ad.currency || preferred_currency === ''" [style.color]="'green'">{{ad.spend}} {{ad.currency}}</span>
+                <span *ngIf="preferred_currency !== '' && preferred_currency !== ad.currency" [style.color]="'green'">{{ad.spend | currencyConverter:ad.currency:preferred_currency | async}}</span>
+              </td>
             </tr>
           </tbody>
           <thead class="thead-default">

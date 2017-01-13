@@ -11,8 +11,10 @@ var api = require('./api-dev.json');
 switch (GlobalVariables.ENVIRONMENT) {
   case 'prod':
     api = require('./api-prod.json');
+    break;
   case 'prev':
     api = require('./api-prev.json');
+    break;
   default:
     api = require('./api-dev.json');
 }

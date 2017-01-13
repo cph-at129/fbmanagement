@@ -37,7 +37,6 @@ exports.getUserInfo = function (user, callback) {
       });
     }, function (err) {
       if (err) return callback(err, null);
-      console.log(facebookUser.adAccountsInfo);
       callback(null, facebookUser);
     });
   });

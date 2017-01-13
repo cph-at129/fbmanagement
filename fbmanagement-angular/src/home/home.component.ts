@@ -52,12 +52,14 @@ export class HomeComponent implements OnInit {
           this.fbmanagerService.logout();
         } else {
           this.userInfo = userInfo;
-          console.log(userInfo.adAccountsInfo);
           userInfo.adAccounts.forEach((adAccount) => {
             this.getAdAccount(adAccount.id);
           });
         }
-      })
+      }).catch((err) => {
+        console.error(err);
+        this.fbmanagerService.logout();
+      });
   }
 
   setCurrency(preferred_currency) {
@@ -86,6 +88,10 @@ export class HomeComponent implements OnInit {
         this.initData(data);
         this.filterBestPerformanceAd();
         this.ref.detectChanges();
+      })
+      .catch((err) => {
+        console.error(err);
+        this.getAdAccount(id);
       })
   }
 
