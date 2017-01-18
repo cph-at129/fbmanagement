@@ -10,7 +10,8 @@
     "start": "webpack-dev-server --inline --progress --port 3000",
     "e2e": "protractor",
     "test": "karma start",
-    "webdriver:update": "webdriver-manager update"
+    "webdriver:update": "webdriver-manager update",
+    "compodoc": "./node_modules/.bin/compodoc -p tsconfig.json"
   },
   "dependencies": {
     "@angular/common": "2.1.1",
