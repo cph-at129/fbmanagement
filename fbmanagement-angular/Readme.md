@@ -15,7 +15,7 @@ the latest data from facebook API, useful features such as sorting and
 filtering of different statistical data, graphical visualization of the data and others.
 
 
-### Quick start
+## Quick start
 **Make sure you have Node version >= 6.0 and NPM >= 3**
 
 ```bash
@@ -30,8 +30,22 @@ npm install
 # start the application
 npm start
 ```
-
 go to [http://localhost:3000](http://localhost:3000) in your browser
+
+## Documentation
+**Provided thanks to [compodoc](https://github.com/compodoc/compodoc)
+
+**To see the documentation in your browser follow the steps:
+
+```bash
+# install compodoc globally
+npm install -g compodoc
+
+# and inside the project directory run
+compodoc -s
+
+```
+go to [http://localhost:8080](http://localhost:8080) in your browser
 
 ## File Structure
 
