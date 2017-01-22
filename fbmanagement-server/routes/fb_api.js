@@ -25,32 +25,57 @@ FB.options({
 });
 
 //**************** FB API ROUTES *********************************
+/**
+ * the function gets the facebook user information either from the Graph API
+ * or from the database if the user has been already saved.
+ * ******************
+ * the parameters that it takes are the user saved on the request obj and callback
+ * ***********************
+ * returns as a first parameter the error if any error occurs and
+ * the second parameter is facebookUser obj containing all the user info
+ */
 exports.getUserInfo = function (user, callback) {
-  _initFacebookUser(user, function (err, facebookUser) {
-    if (err) return callback(err, null);
-    facebookUser.adAccountsInfo = [];
-    async.each(facebookUser.adAccounts, function (adAccount, callbackAdAccountInfo) {
-      _getAdAccountInfo(adAccount, facebookUser, function (err, adAccountInfo) {
-        if (err) return callbackAdAccountInfo(err);
-        facebookUser.adAccountsInfo.push(adAccountInfo);
-        callbackAdAccountInfo();
-      });
-    }, function (err) {
+    _initFacebookUser(user, function (err, facebookUser) {
       if (err) return callback(err, null);
-      callback(null, facebookUser);
-    });
-  });
-}
-
-exports.initFacebookUser = function (user, callback) {
-    _initFacebookUser(user, function (error, facebookUser) {
-      if (error) return callback(error, null);
-      callback(null, facebookUser);
+      facebookUser.adAccountsInfo = [];
+      async.each(facebookUser.adAccounts, function (adAccount, callbackAdAccountInfo) {
+        _getAdAccountInfo(adAccount, facebookUser, function (err, adAccountInfo) {
+          if (err) return callbackAdAccountInfo(err);
+          facebookUser.adAccountsInfo.push(adAccountInfo);
+          callbackAdAccountInfo();
+        });
+      }, function (err) {
+        if (err) return callback(err, null);
+        callback(null, facebookUser);
+      });
     });
   }
   /**
-   * sync ad account now no matter if already syned today
+   * the function is similar to getUserInfo but it does not return
+   * adAccountsInfo on the user obj
+   * ****************
+   * the parameters that it takes are the user saved on the request obj and callback
+   * ******************
+   * returns as a first parameter the error if any error occurs and
+   * the second parameter is the facebookUser obj
    */
+exports.initFacebookUser = function (user, callback) {
+  _initFacebookUser(user, function (error, facebookUser) {
+    if (error) return callback(error, null);
+    callback(null, facebookUser);
+  });
+}
+
+/**
+ * the function will make a synchronization without specifying date ranges
+ * and without cheking if any synchronization has been made already
+ * *******************
+ * the parameters that it takes are the user's business account id,
+ * the logged in user saved in the request obj and a callback
+ * ********************
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the results from the synchronization
+ */
 exports.syncAdAccountNow = function (account_id, user, callback) {
   now = moment();
   SCAN_ID = now.unix();
@@ -64,6 +89,15 @@ exports.syncAdAccountNow = function (account_id, user, callback) {
   });
 }
 
+/**
+ * the function makes a synchronization for specific date range
+ * *********
+ * the parameters are the business account id, date ranges array,
+ * the user obj save on the request obj and a callback function
+ * **************
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the results from the synchronization
+ */
 exports.syncAdAccountForDateRange = function (account_id, dateRange, user, callback) {
   now = moment();
   SCAN_ID = now.unix();
@@ -84,27 +118,15 @@ exports.syncAdAccountForDateRange = function (account_id, dateRange, user, callb
     }
   });
 }
-exports.syncAdAccount = function (account_id, user, callback) {
-  now = moment();
-  SCAN_ID = now.unix();
-  var dateRange = null;
-  _checkIfSynced(account_id, dateRange, function (err, synced, data) {
-    if (err) {
-      return callback(err, null)
-    } else if (synced) {
-      callback(null, data);
-    } else {
-      _initFacebookUser(user, function (err, facebookUser) {
-        if (err) return callback(err, null);
-        _syncAdAccount(account_id, dateRange, facebookUser, function (err, syncResult) {
-          if (err) return callback(err, null);
-          callback(null, syncResult);
-        });
-      });
-    }
-  });
-}
 
+/**
+ * the function gets ad account data saved in the database from past synchronizations
+ * **********
+ * the parameters are the business account id and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the data returned from the database
+ */
 exports.getAdAccountDetails = function (account_id, callback) {
   _getAdAccountDetails(account_id, function (err, result) {
     if (err) return callback(err, null);
@@ -112,6 +134,14 @@ exports.getAdAccountDetails = function (account_id, callback) {
   });
 }
 
+/**
+ * the function gets page data saved in the database from past synchronizations
+ * **********
+ * the parameters are the page id and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the data returned from the database
+ */
 exports.getPageDetails = function (page_id, callback) {
   _getPageDetails(page_id, function (err, result) {
     if (err) return callback(err, null);
@@ -119,6 +149,14 @@ exports.getPageDetails = function (page_id, callback) {
   });
 }
 
+/**
+ * the function gets a post data saved in the database from past synchronizations
+ * **********
+ * the parameters are the post id and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the data returned from the database
+ */
 exports.getPostDetails = function (post_id, callback) {
   _getPostDetails(post_id, function (err, result) {
     if (err) return callback(err, null);
@@ -126,10 +164,20 @@ exports.getPostDetails = function (post_id, callback) {
   });
 }
 
-exports.syncPage = function (page_id, user, callback) {
+/**
+ * the function makes a synchronization for specific date range
+ * but first checks if there has been synchronization saved in the database
+ * for the specified date range, if yes then it returns the database data
+ * *********
+ * the parameters are the page id, date ranges array,
+ * the user obj saved on the request obj and a callback function
+ * **************
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the results from the synchronization
+ */
+exports.syncPage = function (page_id, dateRange, user, callback) {
   now = moment();
   SCAN_ID = now.unix();
-  var dateRange = null;
   _checkIfSynced(page_id, dateRange, function (err, synced, data) {
     if (err) return callback(err, null)
     else if (synced) {
@@ -149,22 +197,17 @@ exports.syncPage = function (page_id, user, callback) {
   });
 }
 
-exports.syncPageNow = function (page_id, user, callback) {
-    now = moment();
-    SCAN_ID = now.unix();
-    _initFacebookUser(user, function (err, facebookUser) {
-      if (err) return callback(err, null);
-      _syncPage(page_id, facebookUser, function (err, pageMetrics) {
-        if (err) return callback(err, null);
-        _savePageMetrics(page_id, pageMetrics, function (err, result) {
-          if (err) return callback(err, null);
-          callback(null, result);
-        });
-      });
-    });
-  }
-  //********************** HELPER FUNCTIONS *************************
+//********************** HELPER FUNCTIONS *************************
 
+/**
+ * the function checks if ad account has been already synced in the database
+ * and if not it will make a synchronization for the account
+ * *********
+ * the parameters are the ad account obj, the facebook user obj, and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the results from the database or the synchronization
+ */
 function _getAdAccountInfo(adAccount, facebookUser, callback) {
   AdAccount.find({
     'id': adAccount.id
@@ -181,6 +224,7 @@ function _getAdAccountInfo(adAccount, facebookUser, callback) {
     }
   });
 }
+
 
 function _syncPage(page_id, facebookUser, callback) {
   var pageMetrics = {};
@@ -377,6 +421,14 @@ function _syncPageGeneralMetrics(page_id, facebookUser, callback) {
   });
 }
 
+/**
+ * the function gets page data saved in the database from past synchronizations
+ * **********
+ * the parameters are the page id and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the data returned from the database
+ */
 function _getPageDetails(id, callback) {
   PageMetrics.find({
     'id': id
@@ -387,6 +439,14 @@ function _getPageDetails(id, callback) {
   });
 }
 
+/**
+ * the function gets a post data saved in the database from past synchronizations
+ * **********
+ * the parameters are the post id and a callback function
+ * **********
+ * returns as a first parameter error if any occured and
+ * as a second parameter obj containing the data returned from the database
+ */
 function _getPostDetails(id, callback) {
   PostGeneralMetrics.find({
     'id': id
@@ -814,3 +874,40 @@ function _filterLatestSyncedData(data, callback) {
   });
   return filteredData;
 }
+
+
+// exports.syncAdAccount = function (account_id, user, callback) {
+//   now = moment();
+//   SCAN_ID = now.unix();
+//   var dateRange = null;
+//   _checkIfSynced(account_id, dateRange, function (err, synced, data) {
+//     if (err) {
+//       return callback(err, null)
+//     } else if (synced) {
+//       callback(null, data);
+//     } else {
+//       _initFacebookUser(user, function (err, facebookUser) {
+//         if (err) return callback(err, null);
+//         _syncAdAccount(account_id, dateRange, facebookUser, function (err, syncResult) {
+//           if (err) return callback(err, null);
+//           callback(null, syncResult);
+//         });
+//       });
+//     }
+//   });
+// }
+
+// exports.syncPageNow = function (page_id, user, callback) {
+//   now = moment();
+//   SCAN_ID = now.unix();
+//   _initFacebookUser(user, function (err, facebookUser) {
+//     if (err) return callback(err, null);
+//     _syncPage(page_id, facebookUser, function (err, pageMetrics) {
+//       if (err) return callback(err, null);
+//       _savePageMetrics(page_id, pageMetrics, function (err, result) {
+//         if (err) return callback(err, null);
+//         callback(null, result);
+//       });
+//     });
+//   });
+// }

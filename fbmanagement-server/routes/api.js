@@ -80,7 +80,7 @@ module.exports = function (app, passport, config) {
         error: 'No page ID found!'
       });
     } else {
-      fbApi.syncPage(id, req.user, function (err, result) {
+      fbApi.syncPage(id, null, req.user, function (err, result) {
         if (err) {
           return next(err);
         } else {
